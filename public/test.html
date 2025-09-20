@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Page</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 40px;
+            background: #f0f0f0;
+        }
+        .container {
+            background: white;
+            padding: 30px;
+            border-radius: 10px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+        }
+        button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 10px;
+        }
+        button:hover {
+            background: #0056b3;
+        }
+        .result {
+            margin: 20px 0;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🧪 Test Page</h1>
+        <p>This is a simple test page to check if JavaScript is working.</p>
+        
+        <button onclick="testClick()">Test Button Click</button>
+        <button onclick="testAPI()">Test API Call</button>
+        
+        <div id="result" class="result" style="display: none;">
+            <h3>Result:</h3>
+            <div id="resultContent"></div>
+        </div>
+    </div>
+
+    <script>
+        console.log('JavaScript is working!');
+        
+        function testClick() {
+            console.log('Button clicked!');
+            showResult('Button click successful! JavaScript is working.');
+        }
+        
+        async function testAPI() {
+            try {
+                console.log('Testing API call...');
+                const response = await fetch('http://localhost:3000/api/health');
+                const data = await response.json();
+                console.log('API response:', data);
+                showResult('API call successful! Response: ' + JSON.stringify(data, null, 2));
+            } catch (error) {
+                console.error('API error:', error);
+                showResult('API call failed: ' + error.message);
+            }
+        }
+        
+        function showResult(message) {
+            document.getElementById('result').style.display = 'block';
+            document.getElementById('resultContent').innerHTML = '<pre>' + message + '</pre>';
+        }
+        
+        // Test on page load
+        window.addEventListener('load', function() {
+            console.log('Page loaded successfully!');
+            showResult('Page loaded! JavaScript is working correctly.');
+        });
+    </script>
+</body>
+</html>
+
+
+
+
