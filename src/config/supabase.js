@@ -1,4 +1,5 @@
 const { createClient } = require('@supabase/supabase-js');
+const path = require('path');
 const logger = require('../utils/logger');
 
 let supabase = null;
@@ -86,11 +87,12 @@ const getAppByAppId = async (appId) => {
     const { data, error } = await getSupabaseAdmin()
       .from('deployed_apps')
       .select('*')
-      .eq('id', appId)
-      .single();
+      .eq('id', appId);
 
     if (error) throw error;
-    return data;
+    
+    // Return the first result or null if no results
+    return data && data.length > 0 ? data[0] : null;
   } catch (error) {
     logger.error('Error fetching app by ID:', error);
     throw error;
@@ -144,24 +146,60 @@ const uploadFile = async (bucketName, filePath, fileBuffer, options = {}) => {
   }
 };
 
+const fileExists = async (bucketName, filePath) => {
+  try {
+    const { data, error } = await getSupabaseAdmin().storage
+      .from(bucketName)
+      .list(path.dirname(filePath), {
+        search: path.basename(filePath)
+      });
+
+    if (error) {
+      logger.error(`Error checking file existence for ${bucketName}/${filePath}:`, error);
+      return false;
+    }
+
+    return data && data.length > 0;
+  } catch (error) {
+    logger.error('Error checking file existence (catch block):', error);
+    return false;
+  }
+};
+
 const downloadFile = async (bucketName, filePath) => {
   try {
+    // First check if file exists
+    const exists = await fileExists(bucketName, filePath);
+    if (!exists) {
+      throw new Error(`File not found in storage: ${bucketName}/${filePath}`);
+    }
+
     const { data, error } = await getSupabaseAdmin().storage
       .from(bucketName)
       .download(filePath);
 
-    if (error) throw error;
+    if (error) {
+      logger.error(`Supabase Storage download error for ${bucketName}/${filePath}:`, error);
+      throw error;
+    }
+    
+    // Convert Blob to Buffer
+    if (data instanceof Blob) {
+      const arrayBuffer = await data.arrayBuffer();
+      return Buffer.from(arrayBuffer);
+    }
+    
     return data;
   } catch (error) {
-    logger.error('Error downloading file from storage:', error);
+    logger.error('Error downloading file from storage (catch block):', error);
     throw error;
   }
 };
 
-const deleteFile = async (bucketName, filePath) => {
+const deleteFile = async (filePath) => {
   try {
     const { error } = await getSupabaseAdmin().storage
-      .from(bucketName)
+      .from('frontend-apps')
       .remove([filePath]);
 
     if (error) throw error;

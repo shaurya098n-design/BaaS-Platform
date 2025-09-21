@@ -1,0 +1,281 @@
+.modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(15, 23, 42, 0.8);
+  backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+  opacity: 0;
+  visibility: hidden;
+  transition: var(--transition-slow);
+}
+
+.modal:not(.hidden) {
+  opacity: 1;
+  visibility: visible;
+}
+
+.modalContent {
+  background: var(--background-primary);
+  border-radius: var(--radius-xl);
+  width: 95%;
+  max-width: 500px;
+  max-height: 85vh;
+  overflow-y: auto;
+  box-shadow: var(--shadow-2xl);
+  transform: scale(0.9) translateY(20px);
+  transition: var(--transition-slow);
+  border: 1px solid var(--border-color);
+  position: relative;
+}
+
+.modalContent::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--primary-color), var(--secondary-color));
+  border-radius: var(--radius-xl) var(--radius-xl) 0 0;
+}
+
+.modal:not(.hidden) .modalContent {
+  transform: scale(1) translateY(0);
+}
+
+.modalHeader {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: var(--space-lg) var(--space-lg) var(--space-md);
+  border-bottom: 1px solid var(--border-color);
+}
+
+.modalHeader h2 {
+  margin: 0;
+  color: var(--text-primary);
+  font-weight: 600;
+  font-size: 1.25rem;
+}
+
+.modalClose {
+  background: none;
+  border: none;
+  font-size: 1.5rem;
+  cursor: pointer;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  padding: 0.5rem;
+  border-radius: var(--radius-sm);
+}
+
+.modalClose:hover {
+  color: var(--text-primary);
+  background: var(--background-tertiary);
+}
+
+.modalBody {
+  padding: var(--space-lg);
+}
+
+.formGroup {
+  margin-bottom: var(--space-md);
+}
+
+.formGroup label {
+  display: block;
+  margin-bottom: var(--space-sm);
+  font-weight: 500;
+  color: var(--text-primary);
+  font-size: 0.875rem;
+}
+
+.fileUpload {
+  border: 2px dashed var(--border-color);
+  border-radius: var(--radius-lg);
+  padding: var(--space-xl);
+  text-align: center;
+  transition: var(--transition);
+  cursor: pointer;
+  position: relative;
+  background: var(--background-secondary);
+}
+
+.fileUpload:hover,
+.fileUpload.dragActive {
+  border-color: var(--primary-color);
+  background: rgba(37, 99, 235, 0.05);
+}
+
+.fileInput {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  opacity: 0;
+  cursor: pointer;
+}
+
+.fileUploadContent {
+  pointer-events: none;
+}
+
+.fileUploadContent i {
+  font-size: 2.5rem;
+  color: var(--primary-color);
+  margin-bottom: var(--space-md);
+  display: block;
+  opacity: 0.8;
+}
+
+.fileUploadContent p {
+  color: var(--text-secondary);
+  margin-bottom: var(--space-md);
+  font-size: 1rem;
+  line-height: 1.5;
+}
+
+.browseBtn {
+  background: var(--primary-color);
+  color: white;
+  border: none;
+  padding: 0.625rem 1.25rem;
+  border-radius: var(--radius-md);
+  font-weight: 500;
+  cursor: pointer;
+  transition: var(--transition);
+  pointer-events: all;
+  font-size: 0.875rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.browseBtn:hover {
+  background: var(--primary-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.formGroup input,
+.formGroup textarea,
+.formGroup select {
+  width: 100%;
+  padding: 1rem;
+  border: 1px solid var(--border-color);
+  border-radius: var(--radius-md);
+  font-size: 1rem;
+  transition: var(--transition);
+  background: var(--background-primary);
+  color: var(--text-primary);
+  font-family: inherit;
+}
+
+.formGroup input:focus,
+.formGroup textarea:focus,
+.formGroup select:focus {
+  outline: none;
+  border-color: var(--primary-color);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+}
+
+.select {
+  cursor: pointer;
+  background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='m6 8 4 4 4-4'/%3e%3c/svg%3e");
+  background-position: right 0.5rem center;
+  background-repeat: no-repeat;
+  background-size: 1.5em 1.5em;
+  padding-right: 2.5rem;
+  appearance: none;
+}
+
+.formGroup textarea {
+  resize: vertical;
+  min-height: 80px;
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: var(--text-inverse);
+  border: none;
+  padding: var(--space-md) var(--space-xl);
+  border-radius: var(--radius-lg);
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-sm);
+  font-size: 1rem;
+  box-shadow: var(--shadow-md);
+  position: relative;
+  overflow: hidden;
+}
+
+.btnPrimary:hover:not(:disabled) {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #3730a3 100%);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.btnPrimary:disabled {
+  opacity: 0.7;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.errorMessage {
+  color: #ef4444;
+  font-size: 0.875rem;
+  margin-top: 1rem;
+  padding: 0.75rem;
+  background: #fef2f2;
+  border: 1px solid #fecaca;
+  border-radius: var(--radius-md);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .modalContent {
+    margin: 0.5rem;
+    width: calc(100% - 1rem);
+    max-width: none;
+    max-height: 95vh;
+  }
+
+  .modalHeader {
+    padding: var(--space-md) var(--space-md) var(--space-sm);
+  }
+
+  .modalHeader h2 {
+    font-size: 1.125rem;
+  }
+
+  .modalBody {
+    padding: var(--space-md);
+  }
+
+  .fileUpload {
+    padding: var(--space-lg);
+  }
+
+  .fileUploadContent i {
+    font-size: 2rem;
+  }
+
+  .fileUploadContent p {
+    font-size: 0.9rem;
+  }
+
+  .browseBtn {
+    padding: 0.5rem 1rem;
+    font-size: 0.8rem;
+  }
+}

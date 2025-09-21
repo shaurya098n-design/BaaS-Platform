@@ -1,0 +1,170 @@
+.dashboardMain {
+  flex: 1;
+  min-width: 0;
+  max-width: calc(100% - 280px);
+  width: 100%;
+  padding: 0;
+}
+
+.dashboardHeader {
+  text-align: left;
+  margin-bottom: 1rem;
+  padding: 0;
+}
+
+.dashboardHeader h1 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  color: var(--text-primary);
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+}
+
+.dashboardHeader p {
+  color: var(--text-secondary);
+  font-size: 1rem;
+  max-width: none;
+  margin: 0;
+}
+
+.dashboardActions {
+  display: flex;
+  gap: 1rem;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  margin-bottom: 1.5rem;
+  align-items: center;
+}
+
+.btn {
+  padding: 0.75rem 1.5rem;
+  border: none;
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  text-align: center;
+  font-size: 0.9rem;
+  position: relative;
+  overflow: hidden;
+  min-height: 40px;
+  letter-spacing: 0.025em;
+}
+
+.btn i {
+  font-size: 0.9rem;
+  width: 16px;
+  text-align: center;
+}
+
+.btn span {
+  white-space: nowrap;
+}
+
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.15), transparent);
+  transition: all 0.4s ease;
+}
+
+.btn:hover::before {
+  left: 100%;
+}
+
+.btnPrimary {
+  background: linear-gradient(135deg, var(--primary-color) 0%, var(--primary-hover) 100%);
+  color: var(--text-inverse);
+  box-shadow: var(--shadow-md);
+  border: none;
+}
+
+.btnPrimary:hover {
+  background: linear-gradient(135deg, var(--primary-hover) 0%, #3730a3 100%);
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-xl);
+}
+
+.btnPrimary:active {
+  transform: translateY(-1px);
+  box-shadow: var(--shadow-md);
+}
+
+.btnOutline {
+  background: var(--background-primary);
+  color: var(--text-primary);
+  border: 1px solid var(--border-color);
+  box-shadow: var(--shadow-xs);
+}
+
+.btnOutline:hover {
+  background: var(--background-secondary);
+  color: var(--text-primary);
+  border-color: var(--border-hover);
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+.btnOutline:active {
+  transform: translateY(0);
+  box-shadow: var(--shadow-xs);
+}
+
+.projectsSection {
+  margin-top: 1.5rem;
+}
+
+.projectsSection h2 {
+  font-size: clamp(1.5rem, 2.5vw, 2rem);
+  margin-bottom: 1rem;
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .dashboardMain {
+    max-width: calc(100% - 260px);
+  }
+}
+
+@media (max-width: 768px) {
+  .dashboardMain {
+    max-width: 100%;
+    order: 1;
+    padding: 0;
+  }
+
+  .dashboardHeader {
+    text-align: center;
+    margin-bottom: 0.75rem;
+  }
+
+  .dashboardActions {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0.75rem;
+    margin-bottom: 1rem;
+  }
+
+  .btn {
+    width: 100%;
+    justify-content: center;
+    padding: 0.75rem 1.25rem;
+    font-size: 0.9rem;
+    border-radius: 8px;
+    min-height: 40px;
+  }
+
+  .projectsSection {
+    margin-top: 1rem;
+  }
+}

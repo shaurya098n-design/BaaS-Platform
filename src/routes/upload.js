@@ -30,13 +30,30 @@ const upload = multer({
   },
   fileFilter: (req, file, cb) => {
     console.log('File filter - mimetype:', file.mimetype);
-    const allowedTypes = ['application/zip', 'application/x-zip-compressed'];
-    if (allowedTypes.includes(file.mimetype)) {
-      console.log('File type allowed');
+    console.log('File filter - originalname:', file.originalname);
+    
+    // Check file extension first (more reliable)
+    const fileName = file.originalname.toLowerCase();
+    const hasZipExtension = fileName.endsWith('.zip');
+    
+    // Check MIME type (comprehensive list)
+    const allowedMimeTypes = [
+      'application/zip',
+      'application/x-zip-compressed',
+      'application/octet-stream', // Some browsers report ZIP as this
+      'application/x-zip',
+      'application/zip-compressed'
+    ];
+    
+    const hasValidMimeType = allowedMimeTypes.includes(file.mimetype);
+    
+    // Accept if either extension or MIME type is valid
+    if (hasZipExtension || hasValidMimeType) {
+      console.log('File type allowed - Extension:', hasZipExtension, 'MIME:', hasValidMimeType);
       cb(null, true);
     } else {
-      console.log('File type not allowed:', file.mimetype);
-      cb(new Error('Only ZIP files are allowed'), false);
+      console.log('File type not allowed - Extension:', hasZipExtension, 'MIME:', hasValidMimeType);
+      cb(new Error('Only ZIP files are allowed. Please upload a .zip file.'), false);
     }
   }
 });
@@ -67,6 +84,8 @@ router.post('/',
     console.log('=== UPLOAD ROUTE HIT ===');
     console.log('Request body:', req.body);
     console.log('Request file:', req.file ? 'File exists' : 'No file');
+    console.log('App name from body:', req.body.appName);
+    console.log('Frontend type from body:', req.body.frontendType);
     
     // Get user ID from auth header
     let userId = null;
@@ -96,19 +115,23 @@ router.post('/',
     }
     
     console.log('Using user ID:', userId);
-    const { name, description, framework } = req.body;
+    const { appName, name, description, frontendType, framework } = req.body;
+    
+    // Use appName if provided, otherwise fall back to name for backward compatibility
+    const finalAppName = appName || name;
+    const finalFramework = frontendType || framework;
 
     if (!req.file) {
       console.log('ERROR: No file uploaded');
       throw new AppError('No file uploaded', 400);
     }
 
-    if (!name || name.trim().length === 0) {
+    if (!finalAppName || finalAppName.trim().length === 0) {
       console.log('ERROR: App name is required');
       throw new AppError('App name is required', 400);
     }
 
-    console.log(`Starting simple upload for user ${userId}, app: ${name}`);
+    console.log(`Starting simple upload for user ${userId}, app: ${finalAppName}`);
     console.log(`File details: ${req.file.originalname}, Size: ${req.file.size} bytes, Type: ${req.file.mimetype}`);
 
     try {
@@ -117,8 +140,8 @@ router.post('/',
       
       logger.info(`=== UPLOAD START ===`);
       logger.info(`User ID: ${userId}`);
-      logger.info(`App Name: ${name}`);
-      logger.info(`Framework: ${framework}`);
+      logger.info(`App Name: ${finalAppName}`);
+      logger.info(`Framework: ${finalFramework}`);
       logger.info(`File: ${req.file.originalname}, Size: ${req.file.size} bytes, Type: ${req.file.mimetype}`);
       logger.info(`Generated App ID: ${appId}`);
 
@@ -126,20 +149,36 @@ router.post('/',
       const { createAppRecord } = require('../config/supabase');
       const appData = {
         user_id: userId,
-        app_name: name.trim(),
+        app_name: finalAppName.trim(),
         app_url: `http://localhost:3000/static/${appId}`,
         api_base_url: `${process.env.API_BASE_URL || 'http://localhost:3000'}/api`,
         storage_path: `apps/${userId}/${appId}`,
         original_filename: req.file.originalname,
         file_size: req.file.size,
         status: 'deployed',
-        framework: framework || 'html',
+        framework: finalFramework || 'html',
         deployed_at: new Date().toISOString()
       };
       
       logger.info(`Creating app record in database...`);
       const appRecord = await createAppRecord(appData);
       logger.info(`App record created successfully: ${appRecord.id}`);
+
+      // Upload the ZIP file to Supabase Storage
+      logger.info(`Uploading ZIP file to storage...`);
+      const { uploadFile } = require('../config/supabase');
+      const zipBuffer = req.file.buffer;
+      
+      await uploadFile(
+        process.env.STORAGE_BUCKET || 'frontend-apps',
+        `${appData.storage_path}/app.zip`,
+        zipBuffer,
+        {
+          contentType: 'application/zip',
+          upsert: true
+        }
+      );
+      logger.info(`ZIP file uploaded to storage successfully`);
 
       // Success response with real data
       const responseData = {
@@ -148,10 +187,10 @@ router.post('/',
         data: {
           id: appRecord.id,
           appId: appId,
-          appName: name.trim(),
+          appName: finalAppName.trim(),
           appUrl: `http://localhost:3000/static/${appId}`,
           apiBaseUrl: `${process.env.API_BASE_URL || 'http://localhost:3000'}/api`,
-          framework: framework || 'html',
+          framework: finalFramework || 'html',
           status: 'deployed',
           deployedAt: new Date().toISOString(),
           fileInfo: {
@@ -333,6 +372,8 @@ router.get('/apps',
           apiBaseUrl: app.api_base_url,
           framework: app.framework,
           status: app.status,
+          original_filename: app.original_filename,
+          file_size: app.file_size,
           createdAt: app.created_at,
           deployedAt: app.deployed_at,
           lastAccessedAt: app.last_accessed_at
@@ -665,6 +706,204 @@ router.post('/apps/:appId/redeploy',
       }
 
       throw error;
+    }
+  })
+);
+
+// Save extracted files to database (replace ZIP with individual files)
+router.post('/:appId/save-extracted', 
+  catchAsync(async (req, res) => {
+    try {
+      const { appId } = req.params;
+      console.log('=== SAVE EXTRACTED FILES REQUEST ===');
+      console.log('App ID:', appId);
+      
+      // Get user ID from auth header
+      let userId = null;
+      
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        try {
+          const { createClient } = require('@supabase/supabase-js');
+          const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+          const { data: { user }, error } = await supabase.auth.getUser(token);
+          if (!error && user) {
+            userId = user.id;
+          }
+        } catch (error) {
+          console.error('Error getting user from token:', error);
+        }
+      }
+      
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      const { getAppByAppId, updateAppRecord } = require('../config/supabase');
+      
+      // Get app and verify ownership
+      const app = await getAppByAppId(appId);
+      if (!app) {
+        return res.status(404).json({
+          success: false,
+          message: 'App not found'
+        });
+      }
+      
+      if (app.user_id !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: 'You can only modify your own apps'
+        });
+      }
+      
+      console.log('App found:', app.app_name);
+      
+      // Extract ZIP file and save individual files
+      const { extractAndSaveFiles, saveFilesToDatabase } = require('../utils/zipExtractor');
+      
+      console.log('Starting ZIP file extraction...');
+      
+      let extractedFiles;
+      try {
+        extractedFiles = await extractAndSaveFiles(appId, app.storage_path);
+        console.log(`Extracted ${extractedFiles.length} files`);
+      } catch (extractionError) {
+        if (extractionError.message.includes('File not found in storage')) {
+          return res.status(400).json({
+            success: false,
+            message: 'ZIP file not found in storage. This app was uploaded before the storage feature was implemented. Please upload a new ZIP file to use the extraction feature.',
+            error: 'ZIP_FILE_NOT_IN_STORAGE'
+          });
+        }
+        throw extractionError;
+      }
+      
+      console.log('Saving file records to database...');
+      const fileRecords = await saveFilesToDatabase(appId, extractedFiles);
+      console.log(`Saved ${fileRecords.length} file records to database`);
+      
+      // Update the app record to mark it as extracted
+      const updates = {
+        status: 'deployed', // Use 'deployed' status (allowed by constraint)
+        original_filename: 'extracted_files', // Mark as extracted instead of null
+        file_size: 0, // Reset file size
+        updated_at: new Date().toISOString()
+      };
+      
+      const updatedApp = await updateAppRecord(appId, updates);
+      console.log('App updated successfully');
+      
+      res.json({
+        success: true,
+        message: 'Files saved to database successfully',
+        data: {
+          appId: updatedApp.id,
+          appName: updatedApp.app_name,
+          status: updatedApp.status,
+          updatedAt: updatedApp.updated_at
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error saving extracted files:', error.message);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to save files to database: ' + error.message
+      });
+    }
+  })
+);
+
+// Get extracted files for an app
+router.get('/:appId/files', 
+  catchAsync(async (req, res) => {
+    try {
+      const { appId } = req.params;
+      console.log('=== GET EXTRACTED FILES REQUEST ===');
+      console.log('App ID:', appId);
+      
+      // Get user ID from auth header
+      let userId = null;
+      
+      const authHeader = req.headers.authorization;
+      if (authHeader && authHeader.startsWith('Bearer ')) {
+        const token = authHeader.substring(7);
+        try {
+          const { createClient } = require('@supabase/supabase-js');
+          const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+          const { data: { user }, error } = await supabase.auth.getUser(token);
+          if (!error && user) {
+            userId = user.id;
+          }
+        } catch (error) {
+          console.error('Error getting user from token:', error);
+        }
+      }
+      
+      if (!userId) {
+        return res.status(401).json({ error: 'Authentication required' });
+      }
+      
+      const { getAppByAppId } = require('../config/supabase');
+      
+      // Get app and verify ownership
+      const app = await getAppByAppId(appId);
+      if (!app) {
+        return res.status(404).json({
+          success: false,
+          message: 'App not found'
+        });
+      }
+      
+      if (app.user_id !== userId) {
+        return res.status(403).json({
+          success: false,
+          message: 'You can only view files for your own apps'
+        });
+      }
+      
+      // Get extracted files from database
+      const { getSupabaseAdmin } = require('../config/supabase');
+      const supabase = getSupabaseAdmin();
+      
+      const { data: files, error } = await supabase
+        .from('extracted_files')
+        .select('*')
+        .eq('app_id', appId)
+        .order('file_path');
+      
+      if (error) {
+        throw error;
+      }
+      
+      res.json({
+        success: true,
+        data: {
+          appId: app.id,
+          appName: app.app_name,
+          totalFiles: files.length,
+          files: files.map(file => ({
+            id: file.id,
+            fileName: file.file_name,
+            filePath: file.file_path,
+            fileType: file.file_type,
+            fileSize: file.file_size,
+            mimeType: file.mime_type,
+            parentDirectory: file.parent_directory,
+            isDirectory: file.is_directory,
+            createdAt: file.created_at
+          }))
+        }
+      });
+      
+    } catch (error) {
+      console.error('Error fetching extracted files:', error.message);
+      res.status(500).json({
+        success: false,
+        message: 'Failed to fetch extracted files: ' + error.message
+      });
     }
   })
 );
