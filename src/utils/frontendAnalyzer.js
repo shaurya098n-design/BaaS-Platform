@@ -79,8 +79,9 @@ class FrontendAnalyzer {
         analysis.pages.push(...htmlAnalysis.pages);
       }
 
-      // 5. Parse JavaScript/TypeScript files
-      const jsFiles = this.findFilesByExtension(projectPath, ['.js', '.jsx', '.ts', '.tsx', '.vue']);
+      // 5. Parse JavaScript/TypeScript files (excluding node_modules)
+      const jsFiles = this.findFilesByExtension(projectPath, ['.js', '.jsx', '.ts', '.tsx', '.vue'])
+        .filter(file => !file.includes('node_modules') && !file.endsWith('.d.ts'));
       for (const jsFile of jsFiles) {
         const jsAnalysis = await this.analyzeJavaScript(jsFile, analysis.framework);
         analysis.apis.push(...jsAnalysis.apis);
@@ -176,11 +177,16 @@ class FrontendAnalyzer {
         }
       }
 
-      // Scan files for framework signatures
+      // Scan files for framework signatures (excluding node_modules)
       const allFiles = await this.getAllFiles(projectPath);
       const frameworkScores = {};
 
       for (const file of allFiles) {
+        // Skip node_modules and TypeScript declaration files
+        if (file.includes('node_modules') || file.endsWith('.d.ts')) {
+          continue;
+        }
+        
         if (file.endsWith('.js') || file.endsWith('.jsx') || file.endsWith('.ts') || file.endsWith('.tsx') || file.endsWith('.vue')) {
           const content = await fs.readFile(file, 'utf8');
           
@@ -384,6 +390,11 @@ class FrontendAnalyzer {
     const analysis = { apis: [], dataModels: [], components: [] };
 
     try {
+      // Skip TypeScript declaration files and node_modules
+      if (filePath.includes('node_modules') || filePath.endsWith('.d.ts')) {
+        return analysis;
+      }
+
       const content = await fs.readFile(filePath, 'utf8');
       
       // Parse JavaScript/TypeScript
@@ -546,26 +557,28 @@ class FrontendAnalyzer {
 
     // Analyze forms for CRUD requirements
     analysis.forms.forEach(form => {
-      if (form.action.includes('create') || form.action.includes('add')) {
-        requirements.crud.push({ operation: 'create', resource: this.inferResourceFromForm(form) });
-      }
-      if (form.action.includes('update') || form.action.includes('edit')) {
-        requirements.crud.push({ operation: 'update', resource: this.inferResourceFromForm(form) });
-      }
-      if (form.action.includes('delete') || form.action.includes('remove')) {
-        requirements.crud.push({ operation: 'delete', resource: this.inferResourceFromForm(form) });
+      if (form.action && typeof form.action === 'string') {
+        if (form.action.includes('create') || form.action.includes('add')) {
+          requirements.crud.push({ operation: 'create', resource: this.inferResourceFromForm(form) });
+        }
+        if (form.action.includes('update') || form.action.includes('edit')) {
+          requirements.crud.push({ operation: 'update', resource: this.inferResourceFromForm(form) });
+        }
+        if (form.action.includes('delete') || form.action.includes('remove')) {
+          requirements.crud.push({ operation: 'delete', resource: this.inferResourceFromForm(form) });
+        }
       }
     });
 
     // Analyze API calls
     analysis.apis.forEach(api => {
-      if (api.url && (api.url.includes('login') || api.url.includes('auth'))) {
+      if (api.url && typeof api.url === 'string' && (api.url.includes('login') || api.url.includes('auth'))) {
         requirements.authentication = true;
       }
-      if (api.url && (api.url.includes('upload') || api.url.includes('file'))) {
+      if (api.url && typeof api.url === 'string' && (api.url.includes('upload') || api.url.includes('file'))) {
         requirements.fileUpload = true;
       }
-      if (api.url && (api.url.includes('search') || api.url.includes('query'))) {
+      if (api.url && typeof api.url === 'string' && (api.url.includes('search') || api.url.includes('query'))) {
         requirements.search = true;
       }
     });

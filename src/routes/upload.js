@@ -379,29 +379,9 @@ router.post('/deploy',
 
 // Get user's deployed apps
 router.get('/apps', 
-  // verifyToken, // Temporarily disabled for testing
+  verifyToken,
   catchAsync(async (req, res) => {
-    // Get user ID from auth header
-    let userId = null;
-    
-    const authHeader = req.headers.authorization;
-    if (authHeader && authHeader.startsWith('Bearer ')) {
-      const token = authHeader.substring(7);
-      try {
-        const { createClient } = require('@supabase/supabase-js');
-        const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-        const { data: { user }, error } = await supabase.auth.getUser(token);
-        if (!error && user) {
-          userId = user.id;
-        }
-      } catch (error) {
-        console.error('Error getting user from token:', error);
-      }
-    }
-    
-    if (!userId) {
-      return res.status(401).json({ error: 'Authentication required' });
-    }
+    const userId = req.user.id;
     
     try {
       const { getCachedUserApps, cacheUserApps } = require('../config/redis');

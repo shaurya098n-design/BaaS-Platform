@@ -1,0 +1,212 @@
+/* File Tree Styles */
+.fileTree {
+  background: var(--surface);
+  border-radius: var(--radius-lg);
+  border: 1px solid var(--border-color);
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  min-width: 250px;
+  max-width: 400px;
+}
+
+.treeHeader {
+  padding: 0.75rem 1rem;
+  border-bottom: 1px solid var(--border-color);
+  background: var(--background);
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.treeHeader h3 {
+  margin: 0;
+  font-size: 0.875rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.treeHeader h3 i {
+  color: var(--primary-color);
+}
+
+.treeStats {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--surface);
+  padding: 0.2rem 0.4rem;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border-color);
+}
+
+.treeContent {
+  flex: 1;
+  overflow-y: auto;
+  overflow-x: hidden;
+  padding: 0.5rem 0;
+  max-height: calc(100% - 60px);
+}
+
+.node {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.25rem 0.5rem;
+  cursor: pointer;
+  transition: var(--transition);
+  border-radius: var(--radius-sm);
+  margin: 0 0.25rem;
+  position: relative;
+  min-height: 24px;
+}
+
+.node:hover {
+  background: var(--background);
+}
+
+.node.selected {
+  background: rgba(99, 102, 241, 0.1);
+  color: var(--primary-color);
+}
+
+.node.selected .nodeIcon {
+  color: var(--primary-color);
+}
+
+.nodeContent {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  flex: 1;
+  min-width: 0;
+}
+
+.nodeIcon {
+  width: 14px;
+  height: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  flex-shrink: 0;
+}
+
+.nodeName {
+  font-size: 0.8rem;
+  color: var(--text-primary);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex: 1;
+  min-width: 0;
+}
+
+.nodeSize {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--background);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-xs);
+  margin-left: 0.5rem;
+  flex-shrink: 0;
+}
+
+.nodeLines {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  background: var(--background);
+  padding: 0.125rem 0.375rem;
+  border-radius: var(--radius-xs);
+  margin-left: 0.25rem;
+  flex-shrink: 0;
+}
+
+.chevron {
+  font-size: 0.75rem;
+  color: var(--text-secondary);
+  transition: var(--transition);
+  flex-shrink: 0;
+}
+
+.children {
+  position: relative;
+}
+
+.children::before {
+  content: '';
+  position: absolute;
+  left: 20px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: var(--border-color);
+  opacity: 0.5;
+}
+
+/* File type specific colors */
+.nodeIcon.fa-folder,
+.nodeIcon.fa-folder-open {
+  color: #f59e0b;
+}
+
+.nodeIcon.fa-file-code {
+  color: #10b981;
+}
+
+.nodeIcon.fa-file-image {
+  color: #8b5cf6;
+}
+
+.nodeIcon.fa-file-pdf {
+  color: #ef4444;
+}
+
+.nodeIcon.fa-file-archive {
+  color: #f97316;
+}
+
+.nodeIcon.fa-file-alt {
+  color: #6b7280;
+}
+
+/* Scrollbar styling */
+.treeContent::-webkit-scrollbar {
+  width: 12px;
+}
+
+.treeContent::-webkit-scrollbar-track {
+  background: var(--background);
+  border-radius: 6px;
+}
+
+.treeContent::-webkit-scrollbar-thumb {
+  background: var(--border-color);
+  border-radius: 6px;
+  border: 2px solid var(--background);
+}
+
+.treeContent::-webkit-scrollbar-thumb:hover {
+  background: var(--text-secondary);
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .node {
+    padding: 0.5rem 0.75rem;
+  }
+  
+  .nodeName {
+    font-size: 0.8rem;
+  }
+  
+  .nodeSize,
+  .nodeLines {
+    font-size: 0.7rem;
+    padding: 0.1rem 0.25rem;
+  }
+}

@@ -31,19 +31,18 @@ export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadMo
   return (
     <div className={`${styles.projectsGrid} ${viewMode === 'list' ? styles.listView : styles.gridView}`}>
       {projects.map((project) => {
-        const isZipFile = project.original_filename && project.original_filename.toLowerCase().endsWith('.zip')
-        const isExtracted = project.original_filename === 'extracted_files'
+        // Since all uploaded ZIP files are automatically extracted, we show them as extracted
+        const wasZipFile = project.original_filename && project.original_filename.toLowerCase().endsWith('.zip')
+        const isExtracted = true // All uploaded files are now extracted
         let cardClass = styles.projectCard
         
-        if (isZipFile) {
-          cardClass = `${styles.projectCard} ${styles.zipFile}`
-        } else if (isExtracted) {
+        if (wasZipFile) {
           cardClass = `${styles.projectCard} ${styles.extractedFile}`
         }
         
         return (
           <div key={project.id} className={cardClass}>
-            {isZipFile && <i className="fas fa-file-archive"></i>}
+            {wasZipFile && <i className="fas fa-folder-open"></i>}
             <div className={styles.projectHeader}>
               <div className={styles.projectTitle}>{project.appName || project.name}</div>
               <div className={`${styles.projectStatus} ${styles[`status${project.status.charAt(0).toUpperCase() + project.status.slice(1)}`]}`}>
@@ -52,19 +51,11 @@ export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadMo
             </div>
             <div className={styles.projectDescription}>
               {project.description || 'No description'}
-              {isZipFile && (
+              {wasZipFile && (
                 <>
                   <br />
                   <small>
-                    <i className="fas fa-file-archive"></i> ZIP Archive - Click to view contents
-                  </small>
-                </>
-              )}
-              {isExtracted && (
-                <>
-                  <br />
-                  <small>
-                    <i className="fas fa-folder-open"></i> Extracted Files - Individual files in database
+                    <i className="fas fa-folder-open"></i> Extracted Project - Individual files available for analysis
                   </small>
                 </>
               )}

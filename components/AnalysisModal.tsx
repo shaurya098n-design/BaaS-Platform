@@ -361,8 +361,7 @@ export default function AnalysisModal({ isOpen, projectId, projectName, authToke
                             return (
                               <pre className={styles.codePreview}>
                                 <code className={`language-${file.language}`}>
-                                  {file.content.substring(0, 1000)}
-                                  {file.content.length > 1000 && '...'}
+                                  {file.content}
                                 </code>
                               </pre>
                             )

@@ -2,6 +2,8 @@
 
 import { useState, useEffect, useCallback } from 'react'
 import styles from './AnalysisTab.module.css'
+import FileTree from './FileTree'
+import ResizablePanel from './ResizablePanel'
 
 interface AnalysisData {
   framework: {
@@ -171,19 +173,6 @@ export default function AnalysisTab({ projectId, projectName, authToken }: Analy
             <i className="fas fa-search"></i>
             {projectName}
           </h1>
-          <div className={styles.projectMeta}>
-            <span className={styles.framework}>
-              <i className="fas fa-code"></i>
-              {analysis.framework.name.charAt(0).toUpperCase() + analysis.framework.name.slice(1)}
-            </span>
-            <span className={styles.confidence}>
-              Confidence: {Math.round(analysis.framework.confidence * 100)}%
-            </span>
-            <span className={styles.files}>
-              <i className="fas fa-file-code"></i>
-              {analysis.files.length} files
-            </span>
-          </div>
         </div>
       </div>
 
@@ -284,72 +273,57 @@ export default function AnalysisTab({ projectId, projectName, authToken }: Analy
 
         {activeTab === 'files' && (
           <div className={styles.files}>
-            <div className={styles.filesHeader}>
-              <h3>
-                <i className="fas fa-folder"></i>
-                Project Files
-              </h3>
-              <div className={styles.filesStats}>
-                {analysis.files.length} files • {formatFileSize(analysis.files.reduce((sum, file) => sum + file.size, 0))}
-              </div>
-            </div>
-            
-            <div className={styles.filesList}>
-              {analysis.files.map((file, index) => (
-                <div 
-                  key={index} 
-                  className={`${styles.fileItem} ${selectedFile === file.path ? styles.selected : ''}`}
-                  onClick={() => setSelectedFile(selectedFile === file.path ? null : file.path)}
-                >
-                  <div className={styles.fileInfo}>
-                    <i className={`fas fa-${file.extension === '.js' || file.extension === '.jsx' ? 'file-code' : 
-                      file.extension === '.html' ? 'file-code' : 
-                      file.extension === '.css' ? 'file-code' : 
-                      file.extension === '.json' ? 'file-code' : 'file'}`}></i>
-                    <div className={styles.fileDetails}>
-                      <div className={styles.fileName}>{file.path}</div>
-                      <div className={styles.fileMeta}>
-                        {file.type} • {formatFileSize(file.size)} • {file.lines} lines
-                      </div>
+            <ResizablePanel
+              leftPanel={
+                <FileTree 
+                  files={analysis.files}
+                  onFileSelect={setSelectedFile}
+                  selectedFile={selectedFile}
+                />
+              }
+              rightPanel={
+                selectedFile ? (
+                  <div className={styles.filePreview}>
+                    <div className={styles.filePreviewHeader}>
+                      <h4>
+                        <i className="fas fa-file-code"></i>
+                        {selectedFile}
+                      </h4>
+                      <button 
+                        className={styles.closePreview}
+                        onClick={() => setSelectedFile(null)}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    </div>
+                    <div className={styles.filePreviewContent}>
+                      {(() => {
+                        const file = analysis.files.find(f => f.path === selectedFile)
+                        if (!file || !file.content) {
+                          return <div className={styles.noPreview}>No preview available</div>
+                        }
+                        return (
+                          <pre className={styles.codePreview}>
+                            <code className={`language-${file.language}`}>
+                              {file.content}
+                            </code>
+                          </pre>
+                        )
+                      })()}
                     </div>
                   </div>
-                  <div className={styles.fileActions}>
-                    <span className={styles.fileLanguage}>{file.language}</span>
-                    <i className={`fas fa-chevron-${selectedFile === file.path ? 'up' : 'down'}`}></i>
+                ) : (
+                  <div className={styles.noFileSelected}>
+                    <i className="fas fa-file-code"></i>
+                    <h3>No file selected</h3>
+                    <p>Select a file from the tree to view its content</p>
                   </div>
-                </div>
-              ))}
-            </div>
-
-            {selectedFile && (
-              <div className={styles.filePreview}>
-                <div className={styles.filePreviewHeader}>
-                  <h4>{selectedFile}</h4>
-                  <button 
-                    className={styles.closePreview}
-                    onClick={() => setSelectedFile(null)}
-                  >
-                    <i className="fas fa-times"></i>
-                  </button>
-                </div>
-                <div className={styles.filePreviewContent}>
-                  {(() => {
-                    const file = analysis.files.find(f => f.path === selectedFile)
-                    if (!file || !file.content) {
-                      return <div className={styles.noPreview}>No preview available</div>
-                    }
-                    return (
-                      <pre className={styles.codePreview}>
-                        <code className={`language-${file.language}`}>
-                          {file.content.substring(0, 2000)}
-                          {file.content.length > 2000 && '...'}
-                        </code>
-                      </pre>
-                    )
-                  })()}
-                </div>
-              </div>
-            )}
+                )
+              }
+              initialLeftWidth={300}
+              minLeftWidth={200}
+              maxLeftWidth={500}
+            />
           </div>
         )}
 
