@@ -25,8 +25,8 @@ export default function Home() {
         })
         
         if (response.ok) {
-          const user = await response.json()
-          setCurrentUser(user)
+          const result = await response.json()
+          setCurrentUser(result.data.user)
           setAuthToken(token)
         } else {
           // Token is invalid, clear it
@@ -122,7 +122,7 @@ export default function Home() {
           onLogout={logout}
           showAuthButtons={false}
         />
-        <Dashboard authToken={authToken} />
+        <Dashboard authToken={authToken} currentUser={currentUser} />
       </>
     )
   }

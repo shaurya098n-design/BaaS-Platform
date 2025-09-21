@@ -3,7 +3,7 @@
 }
 
 .githubStatusCard {
-  background: var(--background-primary);
+  background: var(--background-card);
   border: 1px solid var(--border-color);
   border-radius: var(--radius-lg);
   padding: 1.5rem;
@@ -11,10 +11,12 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: var(--shadow-md);
+  box-shadow: var(--shadow-lg);
   transition: var(--transition);
   position: relative;
   overflow: hidden;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, var(--background-card) 0%, rgba(26, 26, 26, 0.8) 100%);
 }
 
 .githubStatusCard::before {
@@ -140,22 +142,27 @@
   align-items: center;
   margin: 0.5rem 0;
   width: 100%;
+  padding: 0;
 }
 
 .githubCompactCollapsedBtn {
-  width: 48px;
-  height: 48px;
-  border-radius: var(--radius-lg);
+  width: 36px;
+  height: 36px;
+  border-radius: var(--radius-md);
   border: 1px solid var(--border-color);
-  background: var(--bg-primary);
-  color: var(--text-secondary);
+  background: var(--background-card);
+  color: var(--text-primary);
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: var(--transition);
   box-shadow: var(--shadow-sm);
-  font-size: 1.25rem;
+  font-size: 1rem;
+  backdrop-filter: blur(10px);
+  background: linear-gradient(135deg, var(--background-card) 0%, rgba(26, 26, 26, 0.8) 100%);
+  text-align: center;
+  line-height: 1;
 }
 
 .githubCompactCollapsedBtn:hover {

@@ -12,9 +12,10 @@ import styles from './Dashboard.module.css'
 
 interface DashboardProps {
   authToken: string | null
+  currentUser?: any
 }
 
-export default function Dashboard({ authToken }: DashboardProps) {
+export default function Dashboard({ authToken, currentUser }: DashboardProps) {
   const [projects, setProjects] = useState([])
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [loading, setLoading] = useState(true)
@@ -195,6 +196,7 @@ export default function Dashboard({ authToken }: DashboardProps) {
           <Sidebar 
             projects={projects} 
             githubStatus={githubStatus}
+            currentUser={currentUser}
             onGitHubStatusChange={loadGitHubStatus}
           />
           <div className={styles.mainContent}>

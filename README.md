@@ -12,7 +12,7 @@ A comprehensive platform that automatically deploys frontend applications and pr
 - **🗄️ Supabase Integration**: Built-in authentication, storage, and database
 - **⚡ Redis Caching**: High-performance caching with Upstash Redis
 - **📁 Static File Serving**: Automatic static file hosting with CDN-like performance
-- **🔍 Framework Detection**: Automatically detects and configures your frontend framework
+- **🔍 Framework Detection**: Automatically detects and configures your frontend framework (with node_modules filtering)
 - **🌐 Custom Domains**: Support for custom domains and SSL
 - **📊 Analytics**: Built-in usage analytics and monitoring
 - **🔄 CI/CD Ready**: GitHub Actions integration for automated deployments
@@ -24,6 +24,11 @@ A comprehensive platform that automatically deploys frontend applications and pr
 - **✨ Smooth Animations**: Optimized hover effects and transitions
 - **🔐 Enhanced Authentication**: Smooth loading states without page flash
 - **🎨 Compact Design**: Optimized spacing and modern card layouts
+- **📁 File Analysis**: Hierarchical file tree with VS Code-like interface
+- **🔍 Project Analysis**: Comprehensive project analysis with framework detection
+- **📊 Real-time Analytics**: Live project statistics and usage monitoring
+- **🎯 Drag-to-Resize**: Resizable panels for optimal workspace layout
+- **📝 Code Preview**: Full file content preview with syntax highlighting
 
 ## 🏗️ Architecture
 
@@ -391,6 +396,14 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 - [x] **Enhanced Spacing** - Improved spacing between sidebar and main content
 - [x] **Status Tag Styling** - Proper styling for deployed status tags
 - [x] **GitHub Status Integration** - Compact GitHub status display in sidebar
+- [x] **File Analysis System** - Hierarchical file tree with VS Code-like interface
+- [x] **Project Analysis Engine** - Comprehensive project analysis with framework detection
+- [x] **Framework Detection Fix** - Fixed Angular false positives by filtering node_modules
+- [x] **Resizable Panels** - Drag-to-resize functionality for file tree and code preview
+- [x] **Code Preview System** - Full file content preview with syntax highlighting
+- [x] **Authentication Token Fix** - Resolved 401 errors with proper token validation
+- [x] **UI Spacing Optimization** - Reduced gaps and improved compact layout
+- [x] **Code Header Spacing** - Fixed collapsing logo and text in code area headers
 
 ### 🚧 **In Progress**
 - [ ] **Complete BaaS Pipeline** - Transform any frontend into full-stack app

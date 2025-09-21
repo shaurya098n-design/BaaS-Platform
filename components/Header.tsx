@@ -34,7 +34,7 @@ export default function Header({
       <div className={styles.container}>
         <nav className={styles.nav}>
           <a href="#" className={styles.logo}>
-            <i className="fas fa-rocket"></i> BaaS Platform
+            <i className="fas fa-code"></i> DevBaaS
           </a>
           
           <ul className={styles.navLinks}>
@@ -54,7 +54,6 @@ export default function Header({
             </div>
           ) : (
             <div className={styles.userMenu}>
-              <span>{currentUser?.email || 'User'}</span>
               <button className={styles.btnOutline} onClick={onLogout}>
                 Logout
               </button>

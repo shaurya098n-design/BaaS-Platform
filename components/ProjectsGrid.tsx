@@ -45,9 +45,6 @@ export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadMo
             {wasZipFile && <i className="fas fa-folder-open"></i>}
             <div className={styles.projectHeader}>
               <div className={styles.projectTitle}>{project.appName || project.name}</div>
-              <div className={`${styles.projectStatus} ${styles[`status${project.status.charAt(0).toUpperCase() + project.status.slice(1)}`]}`}>
-                {project.status}
-              </div>
             </div>
             <div className={styles.projectDescription}>
               {project.description || 'No description'}

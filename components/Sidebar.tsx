@@ -7,10 +7,11 @@ import styles from './Sidebar.module.css'
 interface SidebarProps {
   projects: any[]
   githubStatus?: any
+  currentUser?: any
   onGitHubStatusChange?: () => void
 }
 
-export default function Sidebar({ projects, githubStatus, onGitHubStatusChange }: SidebarProps) {
+export default function Sidebar({ projects, githubStatus, currentUser, onGitHubStatusChange }: SidebarProps) {
   const [collapsed, setCollapsed] = useState(false)
   const [activeNav, setActiveNav] = useState('overview')
 
@@ -39,7 +40,9 @@ export default function Sidebar({ projects, githubStatus, onGitHubStatusChange }
   return (
     <div className={`${styles.sidebar} ${collapsed ? styles.collapsed : ''}`}>
       <div className={styles.sidebarHeader}>
-        <h3 className={styles.sidebarTitle}>Dashboard</h3>
+        <h3 className={styles.sidebarTitle}>
+          <i className="fas fa-terminal"></i> Dev Console
+        </h3>
         <button className={styles.sidebarToggle} onClick={toggleSidebar}>
           <i className="fas fa-chevron-left"></i>
         </button>
@@ -54,8 +57,8 @@ export default function Sidebar({ projects, githubStatus, onGitHubStatusChange }
             handleNavClick('overview')
           }}
         >
-          <i className="fas fa-home"></i>
-          <span>Overview</span>
+          <i className="fas fa-desktop"></i>
+          <span>Dashboard</span>
         </a>
         <a 
           href="#" 
@@ -65,8 +68,8 @@ export default function Sidebar({ projects, githubStatus, onGitHubStatusChange }
             handleNavClick('projects')
           }}
         >
-          <i className="fas fa-folder"></i>
-          <span>Projects</span>
+          <i className="fas fa-code-branch"></i>
+          <span>Repositories</span>
         </a>
         <a 
           href="#" 
@@ -76,8 +79,8 @@ export default function Sidebar({ projects, githubStatus, onGitHubStatusChange }
             handleNavClick('analytics')
           }}
         >
-          <i className="fas fa-chart-line"></i>
-          <span>Analytics</span>
+          <i className="fas fa-chart-bar"></i>
+          <span>Metrics</span>
         </a>
         <a 
           href="#" 
@@ -87,8 +90,8 @@ export default function Sidebar({ projects, githubStatus, onGitHubStatusChange }
             handleNavClick('settings')
           }}
         >
-          <i className="fas fa-cog"></i>
-          <span>Settings</span>
+          <i className="fas fa-sliders-h"></i>
+          <span>Config</span>
         </a>
       </nav>
 
@@ -102,24 +105,50 @@ export default function Sidebar({ projects, githubStatus, onGitHubStatusChange }
       </div>
 
       <div className={styles.sidebarStats}>
-        <h4 className={styles.sidebarStatsTitle}>Quick Stats</h4>
+        <h4 className={styles.sidebarStatsTitle}>
+          <i className="fas fa-chart-line"></i> Dev Metrics
+        </h4>
         <div className={styles.sidebarStat}>
-          <span className={styles.sidebarStatLabel}>Projects</span>
+          <span className={styles.sidebarStatLabel}>
+            <i className="fas fa-code-branch"></i> Repos
+          </span>
           <span className={styles.sidebarStatValue}>{stats.total}</span>
         </div>
         <div className={styles.sidebarStat}>
-          <span className={styles.sidebarStatLabel}>Active</span>
+          <span className={styles.sidebarStatLabel}>
+            <i className="fas fa-play-circle"></i> Active
+          </span>
           <span className={styles.sidebarStatValue}>{stats.active}</span>
         </div>
         <div className={styles.sidebarStat}>
-          <span className={styles.sidebarStatLabel}>APIs</span>
+          <span className={styles.sidebarStatLabel}>
+            <i className="fas fa-plug"></i> APIs
+          </span>
           <span className={styles.sidebarStatValue}>{stats.apis}</span>
         </div>
         <div className={styles.sidebarStat}>
-          <span className={styles.sidebarStatLabel}>Users</span>
+          <span className={styles.sidebarStatLabel}>
+            <i className="fas fa-users"></i> Users
+          </span>
           <span className={styles.sidebarStatValue}>{stats.users}</span>
         </div>
       </div>
+
+      {currentUser && (
+        <div className={styles.userInfo}>
+          <div className={styles.userAvatar}>
+            <i className="fas fa-user-ninja"></i>
+          </div>
+          <div className={styles.userDetails}>
+            <div className={styles.userName}>
+              {currentUser.email?.split('@')[0] || 'User'}
+            </div>
+            <div className={styles.userEmail}>
+              {currentUser.email}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

@@ -1,9 +1,24 @@
 .dashboard {
-  background: var(--background-secondary);
+  background: linear-gradient(135deg, var(--background-primary) 0%, var(--background-secondary) 100%);
   min-height: calc(100vh - 80px);
-  padding: 0.5rem;
+  padding: 1rem;
   margin-top: 80px;
   width: 100%;
+  position: relative;
+}
+
+.dashboard::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background: 
+    radial-gradient(circle at 20% 80%, rgba(0, 212, 255, 0.1) 0%, transparent 50%),
+    radial-gradient(circle at 80% 20%, rgba(124, 58, 237, 0.1) 0%, transparent 50%);
+  pointer-events: none;
+  z-index: 0;
 }
 
 .container {
@@ -11,6 +26,8 @@
   margin: 0;
   padding: 0 0.5rem;
   width: 100%;
+  position: relative;
+  z-index: 1;
 }
 
 .dashboardLayout {
