@@ -119,6 +119,7 @@ export default function UploadModal({ authToken, onClose, onSuccess }: UploadMod
                 onDragLeave={handleDrag}
                 onDragOver={handleDrag}
                 onDrop={handleDrop}
+                onClick={() => document.getElementById('file')?.click()}
               >
                 <input
                   type="file"
@@ -140,7 +141,11 @@ export default function UploadModal({ authToken, onClose, onSuccess }: UploadMod
                       'Drag & drop your ZIP file here or click to browse'
                     )}
                   </p>
-                  <button type="button" className={styles.browseBtn}>
+                  <button 
+                    type="button" 
+                    className={styles.browseBtn}
+                    onClick={() => document.getElementById('file')?.click()}
+                  >
                     {file ? 'Change File' : 'Browse Files'}
                   </button>
                 </div>

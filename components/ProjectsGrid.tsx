@@ -73,20 +73,20 @@ export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadMo
                 target="_blank" 
                 className={`${styles.btnSmall} ${styles.btnSuccess}`}
               >
-                <i className="fas fa-external-link-alt"></i> View App
+                View App
               </a>
               <a 
                 href={project.apiBaseUrl || project.admin_url} 
                 target="_blank" 
                 className={`${styles.btnSmall} ${styles.btnWarning}`}
               >
-                <i className="fas fa-cog"></i> API
+                API
               </a>
               <button 
                 className={`${styles.btnSmall} ${styles.btnDanger}`}
                 onClick={() => onDeleteProject(project.id)}
               >
-                <i className="fas fa-trash"></i> Delete
+                Delete
               </button>
             </div>
           </div>

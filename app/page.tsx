@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Header from '@/components/Header'
 import Hero from '@/components/Hero'
 import Features from '@/components/Features'
@@ -13,11 +13,7 @@ export default function Home() {
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
 
-  useEffect(() => {
-    checkAuthStatus()
-  }, [])
-
-  const checkAuthStatus = async () => {
+  const checkAuthStatus = useCallback(async () => {
     const token = localStorage.getItem('authToken')
     if (token) {
       try {
@@ -39,7 +35,11 @@ export default function Home() {
         logout()
       }
     }
-  }
+  }, [])
+
+  useEffect(() => {
+    checkAuthStatus()
+  }, [checkAuthStatus])
 
   const logout = () => {
     localStorage.removeItem('authToken')

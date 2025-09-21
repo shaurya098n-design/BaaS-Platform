@@ -1,6 +1,6 @@
 'use client'
 
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import Sidebar from './Sidebar'
 import DashboardMain from './DashboardMain'
 import UploadModal from './UploadModal'
@@ -28,13 +28,7 @@ export default function Dashboard({ authToken }: DashboardProps) {
     onConfirm: () => {}
   })
 
-  useEffect(() => {
-    if (authToken) {
-      loadDashboardData()
-    }
-  }, [authToken])
-
-  const loadDashboardData = async () => {
+  const loadDashboardData = useCallback(async () => {
     try {
       const [projectsResponse, githubResponse] = await Promise.all([
         fetch(`/api/upload/apps?t=${Date.now()}`, {
@@ -71,7 +65,13 @@ export default function Dashboard({ authToken }: DashboardProps) {
     } finally {
       setLoading(false)
     }
-  }
+  }, [authToken])
+
+  useEffect(() => {
+    if (authToken) {
+      loadDashboardData()
+    }
+  }, [authToken, loadDashboardData])
 
   const loadGitHubStatus = async () => {
     try {
