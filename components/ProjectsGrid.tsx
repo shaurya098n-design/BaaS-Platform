@@ -6,9 +6,11 @@ interface ProjectsGridProps {
   projects: any[]
   onDeleteProject: (projectId: string) => void
   onShowUploadModal: () => void
+  onViewAnalysis: (projectId: string, projectName: string) => void
+  viewMode?: 'grid' | 'list'
 }
 
-export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadModal }: ProjectsGridProps) {
+export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadModal, onViewAnalysis, viewMode = 'grid' }: ProjectsGridProps) {
   if (projects.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -27,7 +29,7 @@ export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadMo
   }
 
   return (
-    <div className={styles.projectsGrid}>
+    <div className={`${styles.projectsGrid} ${viewMode === 'list' ? styles.listView : styles.gridView}`}>
       {projects.map((project) => {
         const isZipFile = project.original_filename && project.original_filename.toLowerCase().endsWith('.zip')
         const isExtracted = project.original_filename === 'extracted_files'
@@ -68,20 +70,12 @@ export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadMo
               )}
             </div>
             <div className={styles.projectActions}>
-              <a 
-                href={project.appUrl || project.frontend_url} 
-                target="_blank" 
-                className={`${styles.btnSmall} ${styles.btnSuccess}`}
+              <button 
+                className={`${styles.btnSmall} ${styles.btnSecondary}`}
+                onClick={() => onViewAnalysis(project.id, project.appName || project.name)}
               >
-                View App
-              </a>
-              <a 
-                href={project.apiBaseUrl || project.admin_url} 
-                target="_blank" 
-                className={`${styles.btnSmall} ${styles.btnWarning}`}
-              >
-                API
-              </a>
+                View Analysis
+              </button>
               <button 
                 className={`${styles.btnSmall} ${styles.btnDanger}`}
                 onClick={() => onDeleteProject(project.id)}

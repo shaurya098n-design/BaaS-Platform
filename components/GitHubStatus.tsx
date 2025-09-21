@@ -6,9 +6,13 @@ interface GitHubStatusProps {
   status: any
   onStatusChange: () => void
   compact?: boolean
+  collapsed?: boolean
 }
 
-export default function GitHubStatus({ status, onStatusChange, compact = false }: GitHubStatusProps) {
+export default function GitHubStatus({ status, onStatusChange, compact = false, collapsed = false }: GitHubStatusProps) {
+  // Defensive programming - ensure status is never null/undefined
+  const safeStatus = status || { connected: false, username: '' }
+  
   const connectGitHub = () => {
     const authToken = localStorage.getItem('authToken')
     if (!authToken) {
@@ -19,7 +23,24 @@ export default function GitHubStatus({ status, onStatusChange, compact = false }
   }
 
   if (compact) {
-    console.log('GitHubStatus compact mode - status:', status)
+    console.log('GitHubStatus compact mode - status:', safeStatus)
+    
+    // Ultra-compact version for collapsed sidebar
+    if (collapsed) {
+      return (
+        <div className={styles.githubCompactCollapsed}>
+          <button 
+            className={styles.githubCompactCollapsedBtn}
+            onClick={safeStatus.connected ? () => window.open(`https://github.com/${safeStatus.username}`, '_blank') : connectGitHub}
+            title={safeStatus.connected ? 'View GitHub Profile' : 'Connect GitHub'}
+          >
+            <i className="fab fa-github"></i>
+          </button>
+        </div>
+      )
+    }
+    
+    // Normal compact version for expanded sidebar
     return (
       <div className={styles.githubCompact}>
         <div className={styles.githubCompactHeader}>
@@ -28,19 +49,19 @@ export default function GitHubStatus({ status, onStatusChange, compact = false }
           </div>
           <div className={styles.githubCompactInfo}>
             <span className={styles.githubStatus}>
-              {status.connected ? 'Connected' : 'Not Connected'}
+              {safeStatus.connected ? 'Connected' : 'Not Connected'}
             </span>
-            {status.connected && (
-              <span className={styles.githubUsername}>@{status.username}</span>
+            {safeStatus.connected && (
+              <span className={styles.githubUsername}>@{safeStatus.username}</span>
             )}
           </div>
         </div>
         <button 
           className={styles.githubCompactBtn}
-          onClick={status.connected ? () => window.open(`https://github.com/${status.username}`, '_blank') : connectGitHub}
-          title={status.connected ? 'View GitHub Profile' : 'Connect GitHub'}
+          onClick={safeStatus.connected ? () => window.open(`https://github.com/${safeStatus.username}`, '_blank') : connectGitHub}
+          title={safeStatus.connected ? 'View GitHub Profile' : 'Connect GitHub'}
         >
-          <i className={`fas fa-${status.connected ? 'external-link-alt' : 'link'}`}></i>
+          <i className={`fas fa-${safeStatus.connected ? 'external-link-alt' : 'link'}`}></i>
         </button>
       </div>
     )
@@ -48,25 +69,25 @@ export default function GitHubStatus({ status, onStatusChange, compact = false }
 
   return (
     <div className={styles.githubSection}>
-      <div className={`${styles.githubStatusCard} ${status.connected ? styles.connected : ''}`}>
+      <div className={`${styles.githubStatusCard} ${safeStatus.connected ? styles.connected : ''}`}>
         <div className={styles.githubInfo}>
           <i className="fab fa-github"></i>
           <div className={styles.githubDetails}>
-            <h3>{status.connected ? 'GitHub Connected' : 'Connect GitHub'}</h3>
+            <h3>{safeStatus.connected ? 'GitHub Connected' : 'Connect GitHub'}</h3>
             <p>
-              {status.connected 
-                ? `Connected as @${status.username}` 
+              {safeStatus.connected 
+                ? `Connected as @${safeStatus.username}` 
                 : 'Connect your GitHub account to deploy projects to your repositories'
               }
             </p>
           </div>
         </div>
         <button 
-          className={status.connected ? styles.githubConnectedBtn : styles.githubConnectBtn}
-          onClick={status.connected ? () => window.open(`https://github.com/${status.username}`, '_blank') : connectGitHub}
+          className={safeStatus.connected ? styles.githubConnectedBtn : styles.githubConnectBtn}
+          onClick={safeStatus.connected ? () => window.open(`https://github.com/${safeStatus.username}`, '_blank') : connectGitHub}
         >
           <i className="fab fa-github"></i>
-          {status.connected ? 'View Profile' : 'Connect GitHub'}
+          {safeStatus.connected ? 'View Profile' : 'Connect GitHub'}
         </button>
       </div>
     </div>

@@ -74,7 +74,7 @@ app.get('/health', (req, res) => {
   });
 });
 
-// API routes
+// API routes (must come before static routes)
 app.use('/api/auth', authRoutes);
 app.use('/api/upload', uploadRoutes);
 app.use('/api', apiRoutes);

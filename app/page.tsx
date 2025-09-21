@@ -12,6 +12,7 @@ export default function Home() {
   const [authToken, setAuthToken] = useState<string | null>(null)
   const [showAuthModal, setShowAuthModal] = useState(false)
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
+  const [isLoading, setIsLoading] = useState(true)
 
   const checkAuthStatus = useCallback(async () => {
     const token = localStorage.getItem('authToken')
@@ -28,13 +29,24 @@ export default function Home() {
           setCurrentUser(user)
           setAuthToken(token)
         } else {
-          logout()
+          // Token is invalid, clear it
+          localStorage.removeItem('authToken')
+          setCurrentUser(null)
+          setAuthToken(null)
         }
       } catch (error) {
         console.error('Auth check failed:', error)
-        logout()
+        // Network error, clear token
+        localStorage.removeItem('authToken')
+        setCurrentUser(null)
+        setAuthToken(null)
       }
+    } else {
+      // No token, user is not authenticated
+      setCurrentUser(null)
+      setAuthToken(null)
     }
+    setIsLoading(false)
   }, [])
 
   useEffect(() => {
@@ -61,6 +73,45 @@ export default function Home() {
     setCurrentUser(user)
     setAuthToken(token)
     setShowAuthModal(false)
+  }
+
+  // Show loading screen while checking authentication
+  if (isLoading) {
+    return (
+      <div style={{
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        height: '100vh',
+        background: 'linear-gradient(135deg, #667eea 0%, #764ba2 100%)',
+        color: 'white',
+        fontSize: '1.2rem',
+        fontWeight: '600'
+      }}>
+        <div style={{
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '1rem'
+        }}>
+          <div style={{
+            width: '40px',
+            height: '40px',
+            border: '4px solid rgba(255,255,255,0.3)',
+            borderTop: '4px solid white',
+            borderRadius: '50%',
+            animation: 'spin 1s linear infinite'
+          }}></div>
+          <div>Loading...</div>
+        </div>
+        <style jsx>{`
+          @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+          }
+        `}</style>
+      </div>
+    )
   }
 
   if (currentUser) {

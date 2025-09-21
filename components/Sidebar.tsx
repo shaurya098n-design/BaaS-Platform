@@ -94,9 +94,10 @@ export default function Sidebar({ projects, githubStatus, onGitHubStatusChange }
 
       <div className={styles.githubSection}>
         <GitHubStatus 
-          status={githubStatus || { connected: false }} 
+          status={githubStatus || { connected: false, username: '' }} 
           onStatusChange={onGitHubStatusChange}
           compact={true}
+          collapsed={collapsed}
         />
       </div>
 

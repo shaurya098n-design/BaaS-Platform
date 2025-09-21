@@ -16,6 +16,7 @@
 .sidebar.collapsed {
   width: 70px;
   padding: 1.5rem 0.75rem;
+  overflow: hidden;
 }
 
 .sidebarHeader {
@@ -63,6 +64,11 @@
 
 .sidebarNav {
   margin-bottom: 1.5rem;
+  transition: var(--transition);
+}
+
+.sidebar.collapsed .sidebarNav {
+  margin-bottom: 1rem;
 }
 
 .navItem {
@@ -112,6 +118,11 @@
 .sidebarStats {
   border-top: 1px solid var(--border-color);
   padding-top: 1.5rem;
+  transition: var(--transition);
+}
+
+.sidebar.collapsed .sidebarStats {
+  padding-top: 1rem;
 }
 
 .sidebarStatsTitle {
@@ -135,6 +146,15 @@
   justify-content: space-between;
   padding: 0.5rem 0;
   border-bottom: 1px solid var(--border-color);
+  transition: var(--transition);
+}
+
+.sidebar.collapsed .sidebarStat {
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 0.25rem 0;
+  gap: 0.125rem;
 }
 
 .sidebarStat:last-child {
@@ -171,7 +191,18 @@
 .githubSection {
   margin: var(--space-lg) 0;
   padding: 0 var(--space-sm);
+  transition: var(--transition);
 }
+
+.sidebar.collapsed .githubSection {
+  margin: var(--space-md) 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  width: 100%;
+}
+
 
 /* Responsive */
 @media (max-width: 1024px) {

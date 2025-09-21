@@ -1,10 +1,13 @@
 const express = require('express');
 const multer = require('multer');
+const path = require('path');
+const fs = require('fs-extra');
 const { v4: uuidv4 } = require('uuid');
 const { verifyToken, userRateLimit } = require('../middleware/auth');
 const { catchAsync, AppError } = require('../middleware/errorHandler');
 const fileProcessor = require('../utils/fileProcessor');
 const frontendInjector = require('../utils/frontendInjector');
+const FrontendAnalyzer = require('../utils/frontendAnalyzer');
 const { 
   createAppRecord, 
   updateAppRecord, 
@@ -148,6 +151,7 @@ router.post('/',
       // Create app record in database
       const { createAppRecord } = require('../config/supabase');
       const appData = {
+        id: appId,
         user_id: userId,
         app_name: finalAppName.trim(),
         app_url: `http://localhost:3000/static/${appId}`,
@@ -179,6 +183,57 @@ router.post('/',
         }
       );
       logger.info(`ZIP file uploaded to storage successfully`);
+
+      // Extract files to local static directory for analysis
+      logger.info(`Extracting files to local directory for analysis...`);
+      const fs = require('fs-extra');
+      const path = require('path');
+      const yauzl = require('yauzl');
+      
+      const staticDir = path.join(process.cwd(), 'static');
+      const projectDir = path.join(staticDir, appId);
+      
+      // Create project directory
+      await fs.ensureDir(projectDir);
+      
+      // Extract ZIP file
+      await new Promise((resolve, reject) => {
+        yauzl.fromBuffer(zipBuffer, { lazyEntries: true }, (err, zipfile) => {
+          if (err) return reject(err);
+          
+          zipfile.readEntry();
+          zipfile.on('entry', (entry) => {
+            if (/\/$/.test(entry.fileName)) {
+              // Directory entry
+              zipfile.readEntry();
+            } else {
+              // File entry
+              zipfile.openReadStream(entry, (err, readStream) => {
+                if (err) return reject(err);
+                
+                const filePath = path.join(projectDir, entry.fileName);
+                const dirPath = path.dirname(filePath);
+                
+                fs.ensureDir(dirPath).then(() => {
+                  const writeStream = fs.createWriteStream(filePath);
+                  readStream.pipe(writeStream);
+                  
+                  writeStream.on('close', () => {
+                    zipfile.readEntry();
+                  });
+                  
+                  writeStream.on('error', reject);
+                }).catch(reject);
+              });
+            }
+          });
+          
+          zipfile.on('end', resolve);
+          zipfile.on('error', reject);
+        });
+      });
+      
+      logger.info(`Files extracted successfully to ${projectDir}`);
 
       // Success response with real data
       const responseData = {
@@ -907,5 +962,86 @@ router.get('/:appId/files',
     }
   })
 );
+
+// Analyze project endpoint
+router.get('/analyze/:appId', verifyToken, catchAsync(async (req, res) => {
+  const { appId } = req.params;
+  const userId = req.user.id;
+
+  try {
+    logger.info(`Starting analysis for project ${appId} by user ${userId}`);
+
+    // Get project info from database
+    const supabase = getSupabaseAdmin();
+    const { data: project, error: projectError } = await supabase
+      .from('deployed_apps')
+      .select('*')
+      .eq('id', appId)
+      .eq('user_id', userId)
+      .single();
+
+    if (projectError) {
+      logger.error(`Database error for project ${appId}:`, projectError);
+      return res.status(500).json({
+        success: false,
+        message: 'Database error: ' + projectError.message
+      });
+    }
+
+    if (!project) {
+      logger.warn(`Project ${appId} not found for user ${userId}`);
+      return res.status(404).json({
+        success: false,
+        message: 'Project not found'
+      });
+    }
+
+    // Check if project files exist
+    const projectPath = path.join(process.cwd(), 'static', appId);
+    logger.info(`Checking project path: ${projectPath}`);
+    
+    if (!fs.existsSync(projectPath)) {
+      logger.warn(`Project files not found at path: ${projectPath}`);
+      
+      // Try to find the project by checking if the directory exists with a different name
+      const staticDir = path.join(process.cwd(), 'static');
+      const directories = fs.readdirSync(staticDir).filter(item => {
+        const fullPath = path.join(staticDir, item);
+        return fs.statSync(fullPath).isDirectory();
+      });
+      
+      logger.info(`Available project directories: ${directories.join(', ')}`);
+      
+      return res.status(404).json({
+        success: false,
+        message: `Project files not found. Available projects: ${directories.join(', ')}`
+      });
+    }
+
+    // Initialize analyzer and analyze project
+    const analyzer = new FrontendAnalyzer();
+    const analysis = await analyzer.analyzeProject(projectPath);
+
+    logger.info(`Analysis complete for project ${appId}:`, {
+      framework: analysis.framework.name,
+      files: analysis.files.length,
+      pages: analysis.pages.length,
+      components: analysis.components.length,
+      apis: analysis.apis.length
+    });
+
+    res.json({
+      success: true,
+      data: analysis
+    });
+
+  } catch (error) {
+    logger.error(`Error analyzing project ${appId}:`, error);
+    res.status(500).json({
+      success: false,
+      message: 'Analysis failed: ' + error.message
+    });
+  }
+}));
 
 module.exports = router;

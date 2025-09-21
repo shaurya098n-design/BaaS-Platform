@@ -5,6 +5,9 @@ import Sidebar from './Sidebar'
 import DashboardMain from './DashboardMain'
 import UploadModal from './UploadModal'
 import ConfirmationModal from './ConfirmationModal'
+import AnalysisModal from './AnalysisModal'
+import { useInternalTabs } from './InternalTabs'
+import AnalysisTab from './AnalysisTab'
 import styles from './Dashboard.module.css'
 
 interface DashboardProps {
@@ -15,7 +18,8 @@ export default function Dashboard({ authToken }: DashboardProps) {
   const [projects, setProjects] = useState([])
   const [showUploadModal, setShowUploadModal] = useState(false)
   const [loading, setLoading] = useState(true)
-  const [githubStatus, setGithubStatus] = useState(null)
+  const [githubStatus, setGithubStatus] = useState({ connected: false, username: '' })
+  const { tabs, activeTab, addAnalysisTab, closeTab, switchTab } = useInternalTabs()
   const [confirmationModal, setConfirmationModal] = useState<{
     isOpen: boolean
     title: string
@@ -26,6 +30,15 @@ export default function Dashboard({ authToken }: DashboardProps) {
     title: '',
     message: '',
     onConfirm: () => {}
+  })
+  const [analysisModal, setAnalysisModal] = useState<{
+    isOpen: boolean
+    projectId: string
+    projectName: string
+  }>({
+    isOpen: false,
+    projectId: '',
+    projectName: ''
   })
 
   const loadDashboardData = useCallback(async () => {
@@ -56,12 +69,12 @@ export default function Dashboard({ authToken }: DashboardProps) {
         setGithubStatus(githubData.data || githubData)
       } else {
         console.log('GitHub status not available, setting default')
-        setGithubStatus({ connected: false })
+        setGithubStatus({ connected: false, username: '' })
       }
     } catch (error) {
       console.error('Failed to load dashboard data:', error)
       // Set default GitHub status if API fails
-      setGithubStatus({ connected: false })
+      setGithubStatus({ connected: false, username: '' })
     } finally {
       setLoading(false)
     }
@@ -94,6 +107,11 @@ export default function Dashboard({ authToken }: DashboardProps) {
   const handleUploadSuccess = () => {
     setShowUploadModal(false)
     loadDashboardData()
+  }
+
+
+  const handleViewAnalysis = (projectId: string, projectName: string) => {
+    addAnalysisTab(projectId, projectName)
   }
 
   const handleDeleteProject = (projectId: string) => {
@@ -144,6 +162,32 @@ export default function Dashboard({ authToken }: DashboardProps) {
     )
   }
 
+  const renderTabContent = () => {
+    if (activeTab === 'dashboard') {
+      return (
+        <DashboardMain 
+          projects={projects}
+          onShowUploadModal={() => setShowUploadModal(true)}
+          onDeleteProject={handleDeleteProject}
+          onViewAnalysis={handleViewAnalysis}
+        />
+      )
+    }
+
+    const activeTabData = tabs.find(tab => tab.id === activeTab)
+    if (activeTabData?.type === 'analysis' && activeTabData.projectId) {
+      return (
+        <AnalysisTab 
+          projectId={activeTabData.projectId}
+          projectName={activeTabData.projectName || 'Unknown Project'}
+          authToken={authToken}
+        />
+      )
+    }
+
+    return null
+  }
+
   return (
     <div className={styles.dashboard}>
       <div className={styles.container}>
@@ -153,11 +197,37 @@ export default function Dashboard({ authToken }: DashboardProps) {
             githubStatus={githubStatus}
             onGitHubStatusChange={loadGitHubStatus}
           />
-          <DashboardMain 
-            projects={projects}
-            onShowUploadModal={() => setShowUploadModal(true)}
-            onDeleteProject={handleDeleteProject}
-          />
+          <div className={styles.mainContent}>
+            <div className={styles.tabBar}>
+              {tabs.map(tab => (
+                <div
+                  key={tab.id}
+                  className={`${styles.tab} ${activeTab === tab.id ? styles.active : ''}`}
+                  onClick={() => switchTab(tab.id)}
+                >
+                  <div className={styles.tabContent}>
+                    <i className={`fas fa-${tab.type === 'dashboard' ? 'home' : 'search'}`}></i>
+                    <span className={styles.tabTitle}>{tab.title}</span>
+                    {tab.closable && (
+                      <button
+                        className={styles.closeButton}
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          closeTab(tab.id)
+                        }}
+                      >
+                        <i className="fas fa-times"></i>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+              <div className={styles.tabSpacer}></div>
+            </div>
+            <div className={styles.tabContentArea}>
+              {renderTabContent()}
+            </div>
+          </div>
         </div>
       </div>
       
@@ -182,6 +252,18 @@ export default function Dashboard({ authToken }: DashboardProps) {
           title: '',
           message: '',
           onConfirm: () => {}
+        })}
+      />
+      
+      <AnalysisModal
+        isOpen={analysisModal.isOpen}
+        projectId={analysisModal.projectId}
+        projectName={analysisModal.projectName}
+        authToken={authToken}
+        onClose={() => setAnalysisModal({
+          isOpen: false,
+          projectId: '',
+          projectName: ''
         })}
       />
     </div>

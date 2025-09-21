@@ -2,19 +2,23 @@
 
 import { useState, useEffect } from 'react'
 import ProjectsGrid from './ProjectsGrid'
+import ViewToggle from './ViewToggle'
 import styles from './DashboardMain.module.css'
 
 interface DashboardMainProps {
   projects: any[]
   onShowUploadModal: () => void
   onDeleteProject: (projectId: string) => void
+  onViewAnalysis: (projectId: string, projectName: string) => void
 }
 
 export default function DashboardMain({ 
   projects, 
   onShowUploadModal, 
-  onDeleteProject 
+  onDeleteProject,
+  onViewAnalysis
 }: DashboardMainProps) {
+  const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
   const showTemplates = () => {
     alert('Templates feature coming soon!')
@@ -48,11 +52,19 @@ export default function DashboardMain({
 
 
       <div className={styles.projectsSection}>
-        <h2>Your Projects</h2>
+        <div className={styles.projectsHeader}>
+          <h2>Your Projects</h2>
+          <ViewToggle 
+            currentView={viewMode} 
+            onViewChange={setViewMode}
+          />
+        </div>
         <ProjectsGrid 
           projects={projects} 
           onDeleteProject={onDeleteProject}
           onShowUploadModal={onShowUploadModal}
+          onViewAnalysis={onViewAnalysis}
+          viewMode={viewMode}
         />
       </div>
     </div>
