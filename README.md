@@ -1,53 +1,80 @@
-# Frontend + Backend Deployment Automation Platform
+# 🚀 Backend-as-a-Service (BaaS) Platform
 
-A comprehensive platform that automatically deploys frontend applications and provides pre-built backend APIs with zero configuration required.
+A comprehensive platform that automatically deploys frontend applications and provides pre-built backend APIs with zero configuration required. Built with Next.js, TypeScript, and modern web technologies.
 
-## 🚀 Features
+## ✨ Features
 
-- **One-Click Deployment**: Upload any frontend app (React, Vue, Angular, or vanilla HTML/CSS/JS) as a ZIP file
-- **Automatic API Injection**: Automatically injects API configuration into your frontend code
-- **Pre-built Backend APIs**: Ready-to-use authentication, CRUD, and search APIs
-- **Supabase Integration**: Built-in authentication, storage, and database
-- **Redis Caching**: High-performance caching with Upstash Redis
-- **Static File Serving**: Automatic static file hosting with CDN-like performance
-- **Framework Detection**: Automatically detects and configures your frontend framework
-- **Custom Domains**: Support for custom domains and SSL
-- **Analytics**: Built-in usage analytics and monitoring
-- **CI/CD Ready**: GitHub Actions integration for automated deployments
+- **🎨 Modern UI/UX**: Professional dashboard with glassmorphism effects and responsive design
+- **⚡ Next.js Frontend**: Fast, modern React-based frontend with TypeScript
+- **🔐 One-Click Deployment**: Upload any frontend app (React, Vue, Angular, or vanilla HTML/CSS/JS) as a ZIP file
+- **🔧 Automatic API Injection**: Automatically injects API configuration into your frontend code
+- **🚀 Pre-built Backend APIs**: Ready-to-use authentication, CRUD, and search APIs
+- **🗄️ Supabase Integration**: Built-in authentication, storage, and database
+- **⚡ Redis Caching**: High-performance caching with Upstash Redis
+- **📁 Static File Serving**: Automatic static file hosting with CDN-like performance
+- **🔍 Framework Detection**: Automatically detects and configures your frontend framework
+- **🌐 Custom Domains**: Support for custom domains and SSL
+- **📊 Analytics**: Built-in usage analytics and monitoring
+- **🔄 CI/CD Ready**: GitHub Actions integration for automated deployments
+- **🎯 Auto-Deployment**: Automatic Vercel deployment on GitHub push
+- **💻 GitHub Integration**: Connect GitHub accounts and deploy to repositories
 
 ## 🏗️ Architecture
 
 ```
 ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐
-│   Frontend      │    │   Backend API   │    │   Supabase      │
-│   Upload        │───▶│   Server        │───▶│   Services      │
-│   (ZIP File)    │    │   (Express.js)  │    │   (Auth/DB/Storage)│
+│   Next.js       │    │   Express.js    │    │   Supabase      │
+│   Frontend      │───▶│   Backend API   │───▶│   Services      │
+│   (React/TS)    │    │   Server        │    │   (Auth/DB/Storage)│
 └─────────────────┘    └─────────────────┘    └─────────────────┘
-                                │
-                                ▼
-                       ┌─────────────────┐
-                       │   Redis Cache   │
-                       │   (Upstash)     │
-                       └─────────────────┘
+         │                       │                       │
+         │                       ▼                       │
+         │              ┌─────────────────┐              │
+         │              │   Redis Cache   │              │
+         │              │   (Upstash)     │              │
+         │              └─────────────────┘              │
+         │                                               │
+         ▼                                               ▼
+┌─────────────────┐                            ┌─────────────────┐
+│   Vercel        │                            │   GitHub        │
+│   Deployment    │                            │   Integration   │
+│   (Auto-Deploy) │                            │   (OAuth/Repos) │
+└─────────────────┘                            └─────────────────┘
 ```
 
 ## 🛠️ Tech Stack
 
-- **Backend**: Node.js + Express.js
+### **Frontend**
+- **Framework**: Next.js 14 with App Router
+- **Language**: TypeScript
+- **Styling**: CSS Modules with modern design system
+- **UI Components**: Custom React components with glassmorphism effects
+- **State Management**: React hooks and context
+- **Deployment**: Vercel (auto-deployment on GitHub push)
+
+### **Backend**
+- **Runtime**: Node.js + Express.js
 - **Database**: Supabase PostgreSQL
 - **Authentication**: Supabase Auth
 - **Storage**: Supabase Storage
 - **Caching**: Upstash Redis
 - **File Processing**: yauzl, fs-extra
-- **Deployment**: Vercel, Railway, Docker
+- **Deployment**: Railway, Docker
+
+### **DevOps & Tools**
 - **CI/CD**: GitHub Actions
+- **Code Quality**: ESLint, TypeScript
+- **Version Control**: Git with GitHub integration
+- **Monitoring**: Built-in analytics and error tracking
 
 ## 📋 Prerequisites
 
-- Node.js 18+
-- Supabase account
-- Upstash Redis account (optional)
-- Vercel/Railway account for deployment
+- **Node.js 18+** - For running the development server
+- **Supabase account** - For database, authentication, and storage
+- **Upstash Redis account** (optional) - For caching
+- **Vercel account** - For frontend deployment (auto-deployment)
+- **Railway account** (optional) - For backend deployment
+- **GitHub account** - For version control and CI/CD
 
 ## 🚀 Quick Start
 
@@ -101,13 +128,32 @@ Run the SQL scripts in your Supabase dashboard:
 1. Execute `database/schema.sql` to create tables
 2. Execute `database/seed.sql` to set up default data
 
-### 5. Start the Development Server
+### 5. Start the Development Servers
 
+**Start the Next.js frontend:**
 ```bash
 npm run dev
 ```
 
-The server will start on `http://localhost:3000`
+**Start the Express backend (in a separate terminal):**
+```bash
+npm run server
+```
+
+- **Frontend**: `http://localhost:3000` (Next.js)
+- **Backend**: `http://localhost:3001` (Express.js)
+
+### 6. Auto-Deployment Setup
+
+**For Vercel auto-deployment:**
+1. Connect your GitHub repository to Vercel
+2. Set environment variables in Vercel dashboard
+3. Push to GitHub - automatic deployment will trigger
+
+**Environment Variables for Vercel:**
+- `NEXT_PUBLIC_API_URL` - Your backend API URL
+- `SUPABASE_URL` - Your Supabase project URL
+- `SUPABASE_ANON_KEY` - Your Supabase anonymous key
 
 ## 📖 API Documentation
 
@@ -148,13 +194,22 @@ The server will start on `http://localhost:3000`
 
 ## 🔧 Usage Examples
 
-### Deploy a React App
+### Deploy a Frontend App
 
+**Using the Web Interface:**
+1. Login to the dashboard at `http://localhost:3000`
+2. Click "Upload New Project"
+3. Select your ZIP file (React, Vue, Angular, or vanilla HTML/CSS/JS)
+4. Enter app name and description
+5. Click "Upload Project"
+
+**Using the API:**
 ```bash
-curl -X POST http://localhost:3000/api/upload/deploy \
+curl -X POST http://localhost:3001/api/upload \
   -H "Authorization: Bearer YOUR_TOKEN" \
-  -F "frontend=@my-react-app.zip" \
-  -F "appName=My React App"
+  -F "file=@my-react-app.zip" \
+  -F "appName=My React App" \
+  -F "frontendType=react"
 ```
 
 ### Use the Injected API Client++
@@ -218,13 +273,22 @@ Create a `.env` file in the project root with your configuration.
 
 ## ☁️ Cloud Deployment
 
-### Vercel Deployment
+### Frontend Deployment (Vercel) - ✅ Auto-Configured
 
+**Automatic Deployment:**
+- Push to GitHub → Automatic Vercel deployment
+- No manual configuration needed
+- Environment variables configured in Vercel dashboard
+
+**Manual Setup (if needed):**
 1. Connect your GitHub repository to Vercel
-2. Set environment variables in Vercel dashboard
+2. Set environment variables in Vercel dashboard:
+   - `NEXT_PUBLIC_API_URL` - Your backend API URL
+   - `SUPABASE_URL` - Your Supabase project URL
+   - `SUPABASE_ANON_KEY` - Your Supabase anonymous key
 3. Deploy automatically on push to main branch
 
-### Railway Deployment
+### Backend Deployment (Railway)
 
 1. Connect your GitHub repository to Railway
 2. Set environment variables in Railway dashboard
@@ -304,14 +368,29 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🗺️ Roadmap
 
-- [ ] Multi-tenant support
-- [ ] Advanced analytics dashboard
-- [ ] Custom API endpoint creation
-- [ ] Database schema management
-- [ ] Webhook support
-- [ ] Advanced caching strategies
-- [ ] Performance optimization
-- [ ] Mobile app support
+### ✅ **Completed Features**
+- [x] **Next.js Migration** - Complete frontend migration to Next.js with TypeScript
+- [x] **Modern UI/UX** - Professional dashboard with glassmorphism effects
+- [x] **Auto-Deployment** - Automatic Vercel deployment on GitHub push
+- [x] **GitHub Integration** - OAuth connection and repository management
+- [x] **Enhanced Project Cards** - Modern design with gradients and animations
+- [x] **TypeScript Integration** - Full type safety and better development experience
+- [x] **ESLint Configuration** - Code quality and consistency enforcement
+
+### 🚧 **In Progress**
+- [ ] **Complete BaaS Pipeline** - Transform any frontend into full-stack app
+- [ ] **Project-Specific APIs** - Dynamic endpoints per project
+- [ ] **Enhanced SDK** - Project-specific API client with automatic injection
+
+### 📋 **Planned Features**
+- [ ] **Multi-tenant support** - Support for multiple organizations
+- [ ] **Advanced analytics dashboard** - Detailed usage and performance metrics
+- [ ] **Custom API endpoint creation** - User-defined API endpoints
+- [ ] **Database schema management** - Dynamic database schema generation
+- [ ] **Webhook support** - Real-time notifications and integrations
+- [ ] **Advanced caching strategies** - Intelligent caching and optimization
+- [ ] **Performance optimization** - Advanced performance monitoring
+- [ ] **Mobile app support** - React Native and mobile framework support
 
 ## 🙏 Acknowledgments
 
