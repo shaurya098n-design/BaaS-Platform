@@ -203,7 +203,7 @@
   margin: 0 0 1.5rem 0;
   font-size: 1.25rem;
   font-weight: 600;
-  color: #1f2937;
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -214,20 +214,27 @@
 }
 
 .frameworkCard {
-  background: #ffffff;
-  border: 2px solid #e5e7eb;
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 20, 0.9) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.3);
   border-radius: var(--radius-md);
   padding: 1.25rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(0, 212, 255, 0.1);
 }
 
 .frameworkName {
   font-size: 1.25rem;
   font-weight: 700;
-  color: #1f2937;
+  color: #ffffff;
+  background: linear-gradient(135deg, #ffffff 0%, #00d4ff 50%, #7c3aed 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
 }
 
 .frameworkDetails {
@@ -247,7 +254,7 @@
 }
 
 .confidence {
-  color: #374151;
+  color: rgba(255, 255, 255, 0.8);
   font-size: 0.875rem;
   font-weight: 600;
 }
@@ -259,18 +266,24 @@
 }
 
 .statCard {
-  background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
-  border: 1px solid var(--border-color);
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 20, 0.9) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: var(--radius-md);
   padding: 1.25rem;
   text-align: center;
   transition: var(--transition);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(0, 212, 255, 0.1);
 }
 
 .statCard:hover {
   transform: translateY(-4px);
-  box-shadow: var(--shadow-lg);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.5),
+    0 8px 16px rgba(0, 0, 0, 0.35),
+    0 0 0 1px rgba(0, 212, 255, 0.2);
 }
 
 .statCard i {
@@ -469,11 +482,14 @@
 }
 
 .filePreview {
-  background: var(--bg-secondary);
-  border: 1px solid var(--border-color);
+  background: linear-gradient(135deg, rgba(10, 10, 10, 0.95) 0%, rgba(20, 20, 20, 0.9) 100%);
+  border: 1px solid rgba(0, 212, 255, 0.2);
   border-radius: var(--radius-lg);
   overflow: hidden;
-  box-shadow: var(--shadow-md);
+  box-shadow: 
+    0 8px 32px rgba(0, 0, 0, 0.4),
+    0 2px 8px rgba(0, 0, 0, 0.3),
+    inset 0 1px 0 rgba(0, 212, 255, 0.1);
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -486,15 +502,18 @@
   align-items: center;
   justify-content: space-between;
   padding: 0.75rem 1rem;
-  background: var(--bg-primary);
-  border-bottom: 1px solid var(--border-color);
+  background: linear-gradient(135deg, rgba(15, 15, 15, 0.95) 0%, rgba(25, 25, 25, 0.9) 100%);
+  border-bottom: 1px solid rgba(0, 212, 255, 0.2);
+  position: sticky;
+  top: 0;
+  z-index: 2;
 }
 
 .filePreviewHeader h4 {
   margin: 0;
   font-size: 1.125rem;
   font-weight: 600;
-  color: var(--text-primary);
+  color: #ffffff;
   display: flex;
   align-items: center;
   gap: 0.5rem;
@@ -503,7 +522,7 @@
 .closePreview {
   background: none;
   border: none;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   cursor: pointer;
   padding: 0.5rem;
   border-radius: var(--radius-sm);
@@ -511,8 +530,31 @@
 }
 
 .closePreview:hover {
-  background: var(--bg-secondary);
-  color: var(--text-primary);
+  background: rgba(0, 212, 255, 0.1);
+  color: #ffffff;
+}
+
+.filePreviewActions {
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+.iconBtn {
+  background: none;
+  border: 1px solid rgba(0, 212, 255, 0.3);
+  color: rgba(255, 255, 255, 0.7);
+  cursor: pointer;
+  padding: 0.375rem 0.5rem;
+  border-radius: var(--radius-sm);
+  transition: var(--transition);
+  backdrop-filter: blur(6px);
+}
+
+.iconBtn:hover {
+  background: rgba(0, 212, 255, 0.1);
+  color: #ffffff;
+  border-color: #00d4ff;
 }
 
 .filePreviewContent {
@@ -532,28 +574,28 @@
 }
 
 .filePreviewContent::-webkit-scrollbar-track {
-  background: var(--background);
+  background: rgba(10, 10, 10, 0.8);
   border-radius: 6px;
 }
 
 .filePreviewContent::-webkit-scrollbar-thumb {
-  background: var(--border-color);
+  background: rgba(0, 212, 255, 0.3);
   border-radius: 6px;
-  border: 2px solid var(--background);
+  border: 2px solid rgba(10, 10, 10, 0.8);
 }
 
 .filePreviewContent::-webkit-scrollbar-thumb:hover {
-  background: var(--text-secondary);
+  background: rgba(0, 212, 255, 0.5);
 }
 
 .filePreviewContent::-webkit-scrollbar-corner {
-  background: var(--background);
+  background: rgba(10, 10, 10, 0.8);
 }
 
 .noPreview {
   padding: 3rem;
   text-align: center;
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.7);
   font-style: italic;
 }
 

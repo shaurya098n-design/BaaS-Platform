@@ -10,13 +10,15 @@ interface DashboardMainProps {
   onShowUploadModal: () => void
   onDeleteProject: (projectId: string) => void
   onViewAnalysis: (projectId: string, projectName: string) => void
+  authToken: string | null
 }
 
 export default function DashboardMain({ 
   projects, 
   onShowUploadModal, 
   onDeleteProject,
-  onViewAnalysis
+  onViewAnalysis,
+  authToken
 }: DashboardMainProps) {
   const [viewMode, setViewMode] = useState<'grid' | 'list'>('grid')
 
@@ -65,6 +67,7 @@ export default function DashboardMain({
           onShowUploadModal={onShowUploadModal}
           onViewAnalysis={onViewAnalysis}
           viewMode={viewMode}
+          authToken={authToken}
         />
       </div>
     </div>

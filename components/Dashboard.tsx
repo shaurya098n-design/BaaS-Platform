@@ -171,6 +171,7 @@ export default function Dashboard({ authToken, currentUser }: DashboardProps) {
           onShowUploadModal={() => setShowUploadModal(true)}
           onDeleteProject={handleDeleteProject}
           onViewAnalysis={handleViewAnalysis}
+          authToken={authToken}
         />
       )
     }

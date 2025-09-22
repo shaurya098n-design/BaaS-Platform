@@ -27,10 +27,24 @@ interface FileTreeProps {
   }>
   onFileSelect: (filePath: string) => void
   selectedFile: string | null
+  storageKey?: string
 }
 
-export default function FileTree({ files, onFileSelect, selectedFile }: FileTreeProps) {
-  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(new Set(['test-frontend-app']))
+export default function FileTree({ files, onFileSelect, selectedFile, storageKey }: FileTreeProps) {
+  const [expandedFolders, setExpandedFolders] = useState<Set<string>>(() => {
+    try {
+      if (typeof window !== 'undefined' && storageKey) {
+        const raw = localStorage.getItem(storageKey)
+        if (raw) {
+          const arr = JSON.parse(raw)
+          if (Array.isArray(arr)) {
+            return new Set<string>(arr)
+          }
+        }
+      }
+    } catch {}
+    return new Set<string>([])
+  })
 
   // Convert flat file list to hierarchical tree structure
   const buildFileTree = (files: any[]): FileNode[] => {
@@ -110,6 +124,11 @@ export default function FileTree({ files, onFileSelect, selectedFile }: FileTree
       newExpanded.add(folderPath)
     }
     setExpandedFolders(newExpanded)
+    try {
+      if (typeof window !== 'undefined' && storageKey) {
+        localStorage.setItem(storageKey, JSON.stringify(Array.from(newExpanded)))
+      }
+    } catch {}
   }
 
   const getFileIcon = (node: FileNode) => {

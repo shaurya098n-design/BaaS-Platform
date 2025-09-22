@@ -279,6 +279,7 @@ export default function AnalysisTab({ projectId, projectName, authToken }: Analy
                   files={analysis.files}
                   onFileSelect={setSelectedFile}
                   selectedFile={selectedFile}
+                  storageKey={`filetree:${projectId}`}
                 />
               }
               rightPanel={
@@ -289,12 +290,38 @@ export default function AnalysisTab({ projectId, projectName, authToken }: Analy
                         <i className="fas fa-file-code"></i>
                         {selectedFile}
                       </h4>
-                      <button 
-                        className={styles.closePreview}
-                        onClick={() => setSelectedFile(null)}
-                      >
-                        <i className="fas fa-times"></i>
-                      </button>
+                      <div className={styles.filePreviewActions}>
+                        <button 
+                          className={styles.iconBtn}
+                          title="Toggle word wrap"
+                          onClick={() => {
+                            const container = document.querySelector(`.${styles.codePreview}`) as HTMLElement | null
+                            if (container) {
+                              const isPre = container.style.whiteSpace === 'pre' || !container.style.whiteSpace
+                              container.style.whiteSpace = isPre ? 'pre-wrap' : 'pre'
+                            }
+                          }}
+                        >
+                          <i className="fas fa-text-width"></i>
+                        </button>
+                        <button 
+                          className={styles.iconBtn}
+                          title="Copy code"
+                          onClick={() => {
+                            const file = analysis.files.find(f => f.path === selectedFile)
+                            if (file?.content) navigator.clipboard.writeText(file.content)
+                          }}
+                        >
+                          <i className="fas fa-copy"></i>
+                        </button>
+                        <button 
+                          className={styles.closePreview}
+                          onClick={() => setSelectedFile(null)}
+                          title="Close preview"
+                        >
+                          <i className="fas fa-times"></i>
+                        </button>
+                      </div>
                     </div>
                     <div className={styles.filePreviewContent}>
                       {(() => {

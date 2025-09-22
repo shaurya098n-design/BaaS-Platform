@@ -142,16 +142,17 @@
 }
 
 .projectCard {
-  background: var(--background-card);
-  border: 1px solid var(--border-color);
-  border-radius: var(--radius-lg);
+  background: #0a0a0a;
+  border: 1px solid rgba(0, 212, 255, 0.2);
+  border-radius: 12px;
+  border-top-right-radius: 6px; /* file corner */
   padding: 1rem;
-  transition: var(--transition-slow);
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  backdrop-filter: blur(10px);
-  background: linear-gradient(135deg, var(--background-card) 0%, rgba(26, 26, 26, 0.8) 100%);
+  box-shadow: 
+    0 6px 24px rgba(0, 0, 0, 0.6),
+    0 2px 6px rgba(0, 0, 0, 0.4);
   min-height: 120px;
 }
 
@@ -161,21 +162,43 @@
   top: 0;
   left: 0;
   right: 0;
-  height: 4px;
-  background: linear-gradient(90deg, var(--primary-color), var(--primary-hover));
+  height: 3px;
+  background: linear-gradient(90deg, #00d4ff, #7c3aed, #f59e0b);
   transform: scaleX(0);
-  transition: var(--transition);
+  transition: transform 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  border-radius: 16px 16px 0 0;
+}
+
+/* File fold corner */
+.projectCard::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 28px;
+  height: 28px;
+  background: linear-gradient(135deg, rgba(124, 58, 237, 0.1) 0%, rgba(0, 212, 255, 0.1) 100%);
+  clip-path: polygon(0 0, 100% 0, 100% 100%);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+  border-left: 1px solid rgba(0, 0, 0, 0.5);
+  border-bottom: 1px solid rgba(0, 0, 0, 0.5);
 }
 
 .projectCard:hover::before {
   transform: scaleX(1);
 }
 
+.projectCard:hover::after {
+  opacity: 1;
+}
+
 .projectCard:hover {
-  border-color: var(--primary-color);
-  transform: translateY(-4px) scale(1.01);
-  box-shadow: var(--shadow-glow);
-  background: linear-gradient(135deg, var(--background-card) 0%, rgba(0, 212, 255, 0.1) 100%);
+  border-color: rgba(0, 212, 255, 0.4);
+  transform: translateY(-8px) scale(1.02);
+  box-shadow: 
+    0 20px 40px rgba(0, 0, 0, 0.7),
+    0 8px 16px rgba(0, 0, 0, 0.5),
+    0 0 0 1px rgba(0, 212, 255, 0.3);
 }
 
 .projectCard.zipFile {
@@ -212,14 +235,14 @@
 
 .projectCard i {
   position: absolute;
-  top: 1rem;
-  right: 1rem;
-  font-size: 1.25rem;
-  color: #0ea5e9;
-  opacity: 0.7;
-  transition: var(--transition);
-  filter: drop-shadow(0 2px 4px rgba(14, 165, 233, 0.2));
-  z-index: 1;
+  top: 1.25rem;
+  right: 1.25rem;
+  font-size: 1.5rem;
+  color: #00d4ff;
+  opacity: 0.8;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  filter: drop-shadow(0 4px 8px rgba(0, 212, 255, 0.3));
+  z-index: 2;
 }
 
 .projectCard.zipFile i {
@@ -227,9 +250,10 @@
 }
 
 .projectCard:hover i {
-  transform: scale(1.15) rotate(5deg);
+  transform: scale(1.2) rotate(8deg);
   opacity: 1;
-  filter: drop-shadow(0 4px 8px rgba(14, 165, 233, 0.3));
+  color: #00d4ff;
+  filter: drop-shadow(0 6px 12px rgba(0, 212, 255, 0.5));
 }
 
 .projectHeader {
@@ -240,15 +264,16 @@
 }
 
 .projectTitle {
-  font-size: 1.1rem;
+  font-size: 1rem;
   font-weight: 600;
-  color: var(--text-primary);
-  line-height: 1.3;
-  background: linear-gradient(135deg, var(--text-primary) 0%, var(--primary-color) 100%);
+  color: #ffffff;
+  line-height: 1.2;
+  background: linear-gradient(135deg, #ffffff 0%, #00d4ff 50%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transition: var(--transition);
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.3);
 }
 
 .projectStatus {
@@ -293,29 +318,30 @@
 }
 
 .projectDescription {
-  color: var(--text-secondary);
+  color: rgba(255, 255, 255, 0.85);
   margin-bottom: 1rem;
   line-height: 1.4;
-  font-size: 0.85rem;
-  padding: 0.5rem;
-  background: rgba(99, 102, 241, 0.03);
-  border-radius: var(--radius-sm);
-  border-left: 2px solid var(--primary-color);
-  transition: var(--transition);
+  font-size: 0.8rem;
+  padding: 0.6rem;
+  background: #0f0f0f;
+  border-radius: 6px;
+  border-left: 2px solid #00d4ff;
+  transition: all 0.3s ease;
 }
 
 .projectDescription small {
   font-weight: 600;
-  color: #0ea5e9;
-  background: linear-gradient(135deg, #0ea5e9 0%, #0284c7 100%);
+  color: #00d4ff;
+  background: linear-gradient(135deg, #00d4ff 0%, #7c3aed 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
-  transition: var(--transition);
+  transition: all 0.3s ease;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.2);
 }
 
 .projectCard.extractedFile .projectDescription small {
-  background: linear-gradient(135deg, #10b981 0%, #059669 100%);
+  background: linear-gradient(135deg, #00d4ff 0%, #10b981 100%);
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -325,40 +351,34 @@
   display: flex;
   gap: 0.5rem;
   flex-wrap: wrap;
+  align-items: center;
+  width: 100%;
+  justify-content: flex-start;
 }
 
 .btnSmall {
-  padding: 0.375rem 0.75rem;
-  font-size: 0.75rem;
-  border-radius: var(--radius-sm);
+  padding: 0.5rem 1rem;
+  font-size: 0.8rem;
+  border-radius: 8px;
   font-weight: 600;
-  transition: var(--transition);
+  transition: all 0.2s ease;
   text-decoration: none;
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.375rem;
-  border: none;
+  gap: 0.5rem;
+  border: 1px solid rgba(0, 212, 255, 0.2);
   cursor: pointer;
   position: relative;
   overflow: hidden;
-  box-shadow: var(--shadow-xs);
-  min-height: 28px;
-  backdrop-filter: blur(10px);
+  box-shadow: none;
+  min-height: 32px;
   text-align: center;
   letter-spacing: 0.025em;
 }
 
-.btnSmall::before {
-  content: '';
-  position: absolute;
-  top: 0;
-  left: -100%;
-  width: 100%;
-  height: 100%;
-  background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-  transition: var(--transition-slow);
-}
+/* remove shiny sweep */
+.btnSmall::before { display: none; }
 
 .btnSmall:hover::before {
   left: 100%;
@@ -394,16 +414,17 @@
 
 .btnDanger {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(239, 68, 68, 0.2) 100%);
-  color: #dc2626;
+  color: #ef4444;
   border: 1px solid rgba(239, 68, 68, 0.3);
-  box-shadow: var(--shadow-sm);
+  box-shadow: 0 4px 12px rgba(239, 68, 68, 0.1);
 }
 
 .btnDanger:hover {
   background: linear-gradient(135deg, rgba(239, 68, 68, 0.2) 0%, rgba(239, 68, 68, 0.3) 100%);
   transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
+  box-shadow: 0 8px 20px rgba(239, 68, 68, 0.2);
   border-color: rgba(239, 68, 68, 0.5);
+  color: #ffffff;
 }
 
 .btnInfo {
@@ -421,17 +442,15 @@
 }
 
 .btnSecondary {
-  background: linear-gradient(135deg, rgba(107, 114, 128, 0.1) 0%, rgba(107, 114, 128, 0.2) 100%);
-  color: #6b7280;
-  border: 1px solid rgba(107, 114, 128, 0.3);
-  box-shadow: var(--shadow-sm);
+  background: #131313;
+  color: #e5e7eb;
+  border: 1px solid rgba(0, 212, 255, 0.25);
 }
 
 .btnSecondary:hover {
-  background: linear-gradient(135deg, rgba(107, 114, 128, 0.2) 0%, rgba(107, 114, 128, 0.3) 100%);
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-md);
-  border-color: rgba(107, 114, 128, 0.5);
+  background: #0f0f0f;
+  border-color: rgba(0, 212, 255, 0.45);
+  color: #ffffff;
 }
 
 
@@ -530,4 +549,30 @@
     font-size: 0.8rem;
     margin-right: 0.75rem;
   }
+}
+
+/* Card delete icon (hover) */
+.cardDelete {
+  margin-left: auto;
+  width: 32px;
+  height: 32px;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #fca5a5;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.cardDelete i { font-size: 0.8rem; }
+
+.projectCard:hover .cardDelete {
+  display: inline-flex;
+}
+
+.cardDelete:hover {
+  color: #fecaca;
+  transform: scale(1.1);
 }

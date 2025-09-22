@@ -14,6 +14,8 @@ export default function UploadModal({ authToken, onClose, onSuccess }: UploadMod
   const [appName, setAppName] = useState('')
   const [description, setDescription] = useState('')
   const [frontendType, setFrontendType] = useState('react')
+  const [githubUrl, setGithubUrl] = useState('')
+  const [deployToGithub, setDeployToGithub] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const [dragActive, setDragActive] = useState(false)
@@ -66,6 +68,15 @@ export default function UploadModal({ authToken, onClose, onSuccess }: UploadMod
       setError('Please enter an app name')
       return
     }
+    if (githubUrl) {
+      try {
+        // client-side validation using small helper in public/
+        if (!(window as any).__validateGitHubUrl?.(githubUrl)) {
+          setError('Please enter a valid GitHub repository URL')
+          return
+        }
+      } catch {}
+    }
 
     setLoading(true)
     setError('')
@@ -76,6 +87,8 @@ export default function UploadModal({ authToken, onClose, onSuccess }: UploadMod
       formData.append('appName', appName)
       formData.append('description', description)
       formData.append('frontendType', frontendType)
+      if (githubUrl) formData.append('githubUrl', githubUrl)
+      formData.append('deployToGithub', String(deployToGithub))
 
       const response = await fetch('/api/upload', {
         method: 'POST',
@@ -109,6 +122,31 @@ export default function UploadModal({ authToken, onClose, onSuccess }: UploadMod
           </button>
         </div>
         
+          <div className={styles.formGroup}>
+            <label htmlFor="githubUrl">GitHub Repository URL (Optional)</label>
+            <input
+              type="url"
+              id="githubUrl"
+              placeholder="https://github.com/username/repo or git@github.com:username/repo.git"
+              value={githubUrl}
+              onChange={(e) => setGithubUrl(e.target.value)}
+            />
+            <small style={{color: '#6b7280', fontSize: '0.875rem', marginTop: '0.25rem', display: 'block'}}>
+              Paste your repo to enable linking and optional deployment
+            </small>
+          </div>
+
+          <div className={styles.formGroup}>
+            <label style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+              <input
+                type="checkbox"
+                checked={deployToGithub}
+                onChange={(e) => setDeployToGithub(e.target.checked)}
+              />
+              Deploy to GitHub Pages after processing (optional)
+            </label>
+          </div>
+
         <div className={styles.modalBody}>
           <form onSubmit={handleSubmit}>
             <div className={styles.formGroup}>

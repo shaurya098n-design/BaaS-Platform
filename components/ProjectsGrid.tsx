@@ -1,6 +1,8 @@
 'use client'
 
+import { useState } from 'react'
 import styles from './ProjectsGrid.module.css'
+import ConnectModal from './ConnectModal'
 
 interface ProjectsGridProps {
   projects: any[]
@@ -8,9 +10,13 @@ interface ProjectsGridProps {
   onShowUploadModal: () => void
   onViewAnalysis: (projectId: string, projectName: string) => void
   viewMode?: 'grid' | 'list'
+  authToken: string | null
 }
 
-export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadModal, onViewAnalysis, viewMode = 'grid' }: ProjectsGridProps) {
+export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadModal, onViewAnalysis, viewMode = 'grid', authToken }: ProjectsGridProps) {
+  const [connectModalOpen, setConnectModalOpen] = useState(false)
+  const [selectedProject, setSelectedProject] = useState<{id: string, name: string} | null>(null)
+  
   if (projects.length === 0) {
     return (
       <div className={styles.emptyState}>
@@ -41,39 +47,61 @@ export default function ProjectsGrid({ projects, onDeleteProject, onShowUploadMo
         }
         
         return (
-          <div key={project.id} className={cardClass}>
+          <div 
+            key={project.id} 
+            className={cardClass}
+            onClick={() => onViewAnalysis(project.id, project.appName || project.name)}
+            style={{ cursor: 'pointer' }}
+          >
             {wasZipFile && <i className="fas fa-folder-open"></i>}
             <div className={styles.projectHeader}>
               <div className={styles.projectTitle}>{project.appName || project.name}</div>
             </div>
-            <div className={styles.projectDescription}>
-              {project.description || 'No description'}
-              {wasZipFile && (
-                <>
-                  <br />
-                  <small>
-                    <i className="fas fa-folder-open"></i> Extracted Project - Individual files available for analysis
-                  </small>
-                </>
-              )}
-            </div>
+            {/* description removed as per request */}
             <div className={styles.projectActions}>
               <button 
                 className={`${styles.btnSmall} ${styles.btnSecondary}`}
-                onClick={() => onViewAnalysis(project.id, project.appName || project.name)}
+                onClick={(e) => {
+                  e.stopPropagation()
+                  setSelectedProject({
+                    id: project.id,
+                    name: project.appName || project.name
+                  })
+                  setConnectModalOpen(true)
+                }}
               >
-                View Analysis
+                Connect
               </button>
-              <button 
-                className={`${styles.btnSmall} ${styles.btnDanger}`}
-                onClick={() => onDeleteProject(project.id)}
+              <button
+                className={styles.cardDelete}
+                title="Delete project"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  onDeleteProject(project.id)
+                }}
               >
-                Delete
+                <i className="fas fa-trash"></i>
               </button>
             </div>
           </div>
         )
       })}
+      
+      {connectModalOpen && selectedProject && (
+        <ConnectModal
+          projectId={selectedProject.id}
+          projectName={selectedProject.name}
+          authToken={authToken}
+          onClose={() => {
+            setConnectModalOpen(false)
+            setSelectedProject(null)
+          }}
+          onSuccess={() => {
+            // Handle successful connection
+            console.log('Backend connected successfully!')
+          }}
+        />
+      )}
     </div>
   )
 }

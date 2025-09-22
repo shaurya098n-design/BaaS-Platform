@@ -14,15 +14,26 @@ export default function Home() {
   const [authMode, setAuthMode] = useState<'login' | 'register'>('login')
   const [isLoading, setIsLoading] = useState(true)
 
+  const fetchWithTimeout = async (input: RequestInfo | URL, init: RequestInit = {}, timeoutMs = 5000) => {
+    const controller = new AbortController()
+    const id = setTimeout(() => controller.abort(), timeoutMs)
+    try {
+      const response = await fetch(input, { ...init, signal: controller.signal })
+      return response
+    } finally {
+      clearTimeout(id)
+    }
+  }
+
   const checkAuthStatus = useCallback(async () => {
     const token = localStorage.getItem('authToken')
     if (token) {
       try {
-        const response = await fetch('/api/auth/me', {
+        const response = await fetchWithTimeout('/api/auth/me', {
           headers: {
             'Authorization': `Bearer ${token}`
           }
-        })
+        }, 5000)
         
         if (response.ok) {
           const result = await response.json()
@@ -50,7 +61,10 @@ export default function Home() {
   }, [])
 
   useEffect(() => {
+    // Safety watchdog: always clear loading after fallback timeout
+    const watchdog = setTimeout(() => setIsLoading(false), 6000)
     checkAuthStatus()
+      .finally(() => clearTimeout(watchdog))
   }, [checkAuthStatus])
 
   const logout = () => {
